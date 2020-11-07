@@ -1,0 +1,502 @@
+openapi: 3.0.1
+info:
+  title: OpenSource Issue Träcking System
+  description: ''
+  termsOfService: https://github.com/DevBoxFanBoy/opists
+  contact:
+    email: DevBoxFanBoy@github.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: https://github.com/DevBoxFanBoy/osits/README.md
+servers:
+- url: https://localhost:8080/v1
+- url: http://localhost:8080/v1
+tags:
+- name: projects
+  description: Access to Projects
+- name: issues
+  description: Everything about your project Issues
+paths:
+  /projects:
+    get:
+      tags:
+      - projects
+      summary: Returns all projects
+      description: Returns a list of projects
+      operationId: getAllProject
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projects'
+      security:
+      - api_key: []
+      - basicAuth: []
+  /projects/{projectKey}:
+    get:
+      tags:
+      - projects
+      summary: Returns the Project by key
+      description: Returns the Project
+      operationId: getProject
+      parameters:
+      - name: projectKey
+        in: path
+        description: Key of Project to return
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+      security:
+      - api_key: []
+      - basicAuth: []
+  /projects/{projectKey}/issues:
+    get:
+      tags:
+      - issues
+      summary: Returns all Issues of the Project.
+      description: Returns all Issues of the Project.
+      operationId: getProjectIssues
+      parameters:
+      - name: projectKey
+        in: path
+        description: Key of Project.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issues'
+      security:
+      - api_key: []
+      - basicAuth: []
+    put:
+      tags:
+      - issues
+      summary: Update an existing issue
+      operationId: updateIssue
+      parameters:
+      - name: projectKey
+        in: path
+        description: Key of Project to return
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Issue object that needs to be added to the tracking system
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Issue'
+        required: true
+      responses:
+        400:
+          description: Invalid issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: 'Invalid issue.'
+        403:
+          description: Forbidden access to the Issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 403
+                message: 'No permission to access the Issue.'
+        404:
+          description: Issue not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: 'Issue not found.'
+      security:
+      - osits_auth:
+        - write:issues
+        - read:issues
+      - basicAuth: []
+      x-codegen-request-body-name: body
+    post:
+      tags:
+      - issues
+      summary: Add a new issue to the tracking system
+      operationId: addIssue
+      parameters:
+      - name: projectKey
+        in: path
+        description: Key of Project to return
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Issue object that needs to be added to the tracking system
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Issue'
+        required: true
+      responses:
+        201:
+          description: Successful created Issue.
+          headers:
+            Location:
+              description: "Absolute URL to the created Issue."
+              schema:
+                type: string
+                format: uri
+                example: "https://localhost:8080/v1/projects/DF/issues/0"
+          content:
+            application/json:
+              
+              schema:
+                $ref: '#/components/schemas/Issue'
+        400:
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: 'Invalid request.'
+        403:
+          description: Forbidden access to the Issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 403
+                message: 'No permission to create the Issue.'
+      security:
+      - osits_auth:
+        - write:issues
+        - read:issues
+      - basicAuth: []
+      x-codegen-request-body-name: body
+  /projects/{projectKey}/issues/{id}:
+    get:
+      tags:
+      - issues
+      summary: Find Issue by ID
+      description: Returns a single Issue
+      operationId: getIssueById
+      parameters:
+      - name: projectKey
+        in: path
+        description: Key of Project to return
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: ID of Issue to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Returns Issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Issue'
+        400:
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: 'Invalid request.'
+        404:
+          description: Issue not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: 'Issue not found.'
+      security:
+      - api_key: []
+      - basicAuth: []
+    delete:
+      tags:
+      - issues
+      summary: Deletes a Issue
+      operationId: deleteIssue
+      parameters:
+      #- name: api_key
+      #  in: header
+      #  schema:
+      #    type: string
+      - name: projectKey
+        in: path
+        description: Key of Project to return
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        description: Issue id to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        204:
+          description: Succesfully deleted Issue
+        400:
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                message: 'Invalid ID.'
+        404:
+          description: Issue not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                message: 'Issue not found.'
+      security:
+      - osits_auth:
+        - write:issue
+        - read:issue
+      - basicAuth: []
+components:
+  schemas:
+    Issue:
+      required:
+      - name
+      - description
+      - priority
+      - projectKey
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        name:
+          type: string
+          example: 'New Bug'
+        description:
+          type: string
+          description: Issue description Text.
+          example: 'An error raise when...'
+        status:
+          type: string
+          description: Issue status.
+          enum:
+          - open
+          - refinable
+          - in_progress
+          - blocked
+          - resolved
+          - closed
+        priority:
+          type: string
+          description: Issue priority.
+          enum:
+          - Highest
+          - High
+          - Medium
+          - Low
+          - Lowest
+        projectKey:
+          type: string
+          example: "DF"
+          readOnly: true
+        components:
+          type: array
+          items:
+            type: string
+          example:
+          - "DrinkOwnChampagne"
+          - "EatMyOwnApplication"
+        sprints:
+          type: array
+          items:
+            type: string
+          example:
+          - "Sprint2"
+        estimatedPoints:
+          type: integer
+          description: Issue estimated points of complexity.
+          enum:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 5
+          - 8
+          - 13
+          - 21
+        estimatedTime:
+          type: string
+          description: Issue estimated time until resolved.
+          enum:
+          - 0h
+          - 1h
+          - 2h
+          - 3h
+          - 1day
+          - 2day
+          - 3day
+          - 1week
+          - 2week
+          - 3week
+        affectedVersion:
+          type: string
+          description: Issue affects software version.
+          example: '1.2.3'
+        fixedVersion:
+          type: string
+          description: Software version that fix this issue.
+          example: '1.2.4'
+    Issues:
+      type: object
+      description: List of Issues.
+      properties:
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issue'
+    Sprint:
+      required:
+      - key
+      - name
+      type: object
+      description: Issue in sprint scoped.
+      readOnly: true
+      properties:
+        key:
+          type: string
+          example: "Sprint2"
+        name:
+          type: string
+          example: 'Sprint 2 - Consume DogFooding'
+        start:
+          description: Startdate of the Sprint.
+          type: string
+          format: date-time
+          example: "2020-11-12T07:00:34.700Z"
+        end:
+          description: Enddate of the Sprint.
+          type: string
+          format: date-time
+          example: "2020-11-26T15:18:36.330Z"
+    Projects:
+      type: object
+      description: List of Projects.
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+    Project:
+      type: object
+      required:
+      - key
+      - name
+      properties:
+        key:
+          type: string
+          example: "DF"
+        name:
+          type: string
+          example: "DogFooding"
+        description:
+          type: string
+          example: "The Project used intern for Development."
+        versions:
+          type: array
+          items:
+            type: string
+          example:
+          - '1.2.3'
+          - '1.2.4'
+        components:
+          type: array
+          description: Components of the Project.
+          items:
+            $ref: '#/components/schemas/Component'
+        sprints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sprint'
+    Component:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          example: "DrinkOwnChampagne"
+        description:
+          type: string
+          example: "Used intern for Development."
+        versions:
+          type: array
+          items:
+            type: string
+          example:
+          - 'DOC 1.0.0'
+          - 'DOC 1.0.1'
+    ErrorResponse:
+      type: object
+      description: The general Error Response.
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    osits_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://oauth/auth
+          scopes:
+            write:issue: modify Issue
+            read:issue: read Issue
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
