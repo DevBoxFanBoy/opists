@@ -1,0 +1,3 @@
+FROM swaggerapi/swagger-ui:v3.36.2
+
+ADD apidoc/openapi.yaml /usr/share/nginx/html/openapi.yaml

@@ -35,5 +35,14 @@ docker run --name opists -P 8080:8080 --rm -it opists
 
 Testing
 ```
-curl -v localhost:8080/v1/projects
+curl -v http://localhost:8080/v1/projects
+curl -v http://localhost:8080/v1/projects/DF
+curl -v http://localhost:8080/v1/projects/DF/issues
+curl -v http://localhost:8080/v1/projects/DF/issues/0
+
+curl -X POST http://localhost:8080/v1/projects/DF/issues -H  "Content-Type: application/json" -d "{\"name\":\"New Bug\",\"description\":\"An error raise when...\",\"status\":\"open\",\"priority\":\"Highest\",\"components\":[\"DrinkOwnChampagne\",\"EatMyOwnApplication\"],\"sprints\":[\"Sprint2\"],\"estimatedPoints\":0,\"estimatedTime\":\"0h\",\"affectedVersion\":\"1.2.3\",\"fixedVersion\":\"1.2.4\"}"
+
+curl -X PUT https://localhost:8080/v1/projects/DF/issues -H  "Content-Type: application/json" -d "{\"name\":\"New Bug\",\"description\":\"An error raise when...\",\"status\":\"refinable\",\"priority\":\"Highest\",\"components\":[\"DrinkOwnChampagne\",\"EatMyOwnApplication\"],\"sprints\":[\"Sprint2\"],\"estimatedPoints\":0,\"estimatedTime\":\"0h\",\"affectedVersion\":\"1.2.3\",\"fixedVersion\":\"1.2.4\"}"
+
+curl -X DELETE https://localhost:8080/v1/projects/DF/issues/0
 ```
