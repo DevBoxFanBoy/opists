@@ -2,19 +2,19 @@ package server
 
 import (
 	"github.com/DevBoxFanBoy/opists/pkg/api/router"
-	"github.com/DevBoxFanBoy/opists/pkg/api/v1/rest"
-	"github.com/DevBoxFanBoy/opists/pkg/api/v1/rest/service"
+	"github.com/DevBoxFanBoy/opists/pkg/api/v1/rest/issues"
+	"github.com/DevBoxFanBoy/opists/pkg/api/v1/rest/projects"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
 
 func NewIssueTrackingSystemRouterV1() *mux.Router {
-	IssuesApiService := service.NewIssuesApiService()
-	IssuesApiController := rest.NewIssuesApiController(IssuesApiService)
+	IssuesApiService := issues.NewApiService()
+	IssuesApiController := issues.NewApiController(IssuesApiService)
 
-	ProjectsApiService := service.NewProjectsApiService()
-	ProjectsApiController := rest.NewProjectsApiController(ProjectsApiService)
+	ProjectsApiService := projects.NewApiService()
+	ProjectsApiController := projects.NewApiController(ProjectsApiService)
 
 	return router.NewRouter(IssuesApiController, ProjectsApiController)
 }

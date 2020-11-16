@@ -1,14 +1,14 @@
-package business
+package project
 
 import (
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
 	"time"
 )
 
-type ProjectUseCase struct {
+type UseCase struct {
 }
 
-func (p *ProjectUseCase) GetAllProject() (interface{}, error) {
+func (p *UseCase) GetAllProject() (interface{}, error) {
 	prj, err := createProjectModel("DF")
 	if err != nil {
 		return nil, err
@@ -16,7 +16,7 @@ func (p *ProjectUseCase) GetAllProject() (interface{}, error) {
 	return model.Projects{Projects: []model.Project{prj}}, nil
 }
 
-func (p *ProjectUseCase) GetProject(projectKey string) (interface{}, error) {
+func (p *UseCase) GetProject(projectKey string) (interface{}, error) {
 	return createProjectModel(projectKey)
 }
 
