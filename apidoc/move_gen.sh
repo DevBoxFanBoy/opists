@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 # move generated code to the repo source folder
-mv ../gen/v1/api.go ../pkg/api/rest/v1/api.go
+mv ../gen/go/api.go ../pkg/api/v1/rest/api.go
