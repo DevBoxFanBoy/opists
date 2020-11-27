@@ -65,8 +65,19 @@ func EncodeJSONResponse(i interface{}, status *int, w http.ResponseWriter) error
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
-
+	if i == nil {
+		return json.NewEncoder(w).Encode("")
+	}
 	return json.NewEncoder(w).Encode(i)
+}
+
+func NotFoundError(w http.ResponseWriter, err error) {
+	errorResponse := model.ErrorResponse{
+		Code:    404,
+		Message: err.Error(),
+	}
+	status := http.StatusNotFound
+	EncodeJSONResponse(errorResponse, &status, w)
 }
 
 func InternalError(w http.ResponseWriter, err error) {
@@ -84,6 +95,34 @@ func BadRequest(w http.ResponseWriter, err error) {
 		Message: err.Error(),
 	}
 	status := http.StatusBadRequest
+	EncodeJSONResponse(errorResponse, &status, w)
+}
+
+func BadRequestErrorResponse(w http.ResponseWriter, errorResponse model.ErrorResponse) {
+	status := http.StatusBadRequest
+	EncodeJSONResponse(errorResponse, &status, w)
+}
+
+func HandleErrorResponses(w http.ResponseWriter, errorResponse model.ErrorResponse) {
+	switch errorResponse.Code {
+	case 400:
+		BadRequestErrorResponse(w, errorResponse)
+		return
+	case 404:
+		NotFoundErrorResponse(w, errorResponse)
+	default:
+		InternalErrorResponse(w, errorResponse)
+		return
+	}
+}
+
+func NotFoundErrorResponse(w http.ResponseWriter, errorResponse model.ErrorResponse) {
+	status := http.StatusNotFound
+	EncodeJSONResponse(errorResponse, &status, w)
+}
+
+func InternalErrorResponse(w http.ResponseWriter, errorResponse model.ErrorResponse) {
+	status := http.StatusInternalServerError
 	EncodeJSONResponse(errorResponse, &status, w)
 }
 

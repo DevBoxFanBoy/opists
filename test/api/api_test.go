@@ -8,10 +8,12 @@ import (
 	"github.com/cucumber/godog"
 	"github.com/cucumber/godog/colors"
 	"github.com/gorilla/mux"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -24,8 +26,8 @@ func (a *apiFeature) resetResponse(*godog.Scenario) {
 	a.resp = httptest.NewRecorder()
 }
 
-func (a *apiFeature) iSendRequestTo(method, endpoint string) (err error) {
-	req, err := http.NewRequest(method, endpoint, nil)
+func (a *apiFeature) iSendRequestTo(method, endpoint string, body string) (err error) {
+	req, err := http.NewRequest(method, endpoint, requestBody(body))
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -44,6 +46,14 @@ func (a *apiFeature) iSendRequestTo(method, endpoint string) (err error) {
 
 	a.apiRouter.ServeHTTP(a.resp, req)
 	return
+}
+
+func requestBody(body string) io.Reader {
+	if len(body) == 0 {
+		return nil
+	} else {
+		return strings.NewReader(body)
+	}
 }
 
 func (a *apiFeature) theResponseCodeShouldBe(code int) error {
@@ -73,15 +83,24 @@ func (a *apiFeature) theResponseShouldMatchJSON(body *godog.DocString) (err erro
 	return nil
 }
 
+func (a *apiFeature) theResponseHeaderShouldMatch(headerName string, expectedValue string) (err error) {
+	actual := a.resp.Header().Get(headerName)
+	if !reflect.DeepEqual(expectedValue, actual) {
+		return fmt.Errorf("expected header %v does not match actual, \nexpect: %v vs. \nactual: %v", headerName, expectedValue, actual)
+	}
+	return nil
+}
+
 func InitializeScenario(ctx *godog.ScenarioContext) {
 	apiFeature := &apiFeature{}
 	apiFeature.apiRouter = server.NewIssueTrackingSystemRouterV1()
 
 	ctx.BeforeScenario(apiFeature.resetResponse)
 
-	ctx.Step(`^I send "(GET|POST|PUT|DELETE)" request to "([^"]*)"$`, apiFeature.iSendRequestTo)
+	ctx.Step(`^I send "(GET|POST|PUT|DELETE)" request to "([^"]*)" with body '([^']*)'$`, apiFeature.iSendRequestTo)
 	ctx.Step(`^the response code should be (\d+)$`, apiFeature.theResponseCodeShouldBe)
 	ctx.Step(`^the response should match json:$`, apiFeature.theResponseShouldMatchJSON)
+	ctx.Step(`^the response header "([^"]*)" match value "([^"]*)"$`, apiFeature.theResponseHeaderShouldMatch)
 }
 
 var opts = godog.Options{

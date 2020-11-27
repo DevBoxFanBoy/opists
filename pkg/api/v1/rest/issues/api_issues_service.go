@@ -11,53 +11,56 @@
 package issues
 
 import (
-	"errors"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
+	"github.com/DevBoxFanBoy/opists/pkg/business/usecase/issue"
 )
 
 // IssuesApiService is a service that implents the logic for the IssuesApiServicer
 // This service should implement the business logic for every endpoint for the IssuesApi API.
 // Include any external packages or services that will be required by this service.
 type ApiService struct {
+	issueUseCase issue.UseCase
 }
 
 // NewApiService creates a default api service
 func NewApiService() v1.IssuesApiServicer {
-	return &ApiService{}
+	i := issue.NewUseCaseController()
+	return &ApiService{issueUseCase: i}
 }
 
 // AddIssue - Add a new issue to the tracking system
 func (s *ApiService) AddIssue(projectKey string, body model.Issue) (interface{}, error) {
+
 	// TODO - update AddIssue with the required logic for this service method.
 	// Add api_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'AddIssue' not implemented")
+	return s.issueUseCase.AddIssue(projectKey, body)
 }
 
 // DeleteIssue - Deletes a Issue
 func (s *ApiService) DeleteIssue(projectKey string, id int64) (interface{}, error) {
 	// TODO - update DeleteIssue with the required logic for this service method.
-	// Add api_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'DeleteIssue' not implemented")
+	// Add a<pi_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	return s.issueUseCase.DeleteIssue(projectKey, id)
 }
 
 // GetIssueById - Find Issue by ID
 func (s *ApiService) GetIssueById(projectKey string, id int64) (interface{}, error) {
 	// TODO - update GetIssueById with the required logic for this service method.
 	// Add api_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'GetIssueById' not implemented")
+	return s.issueUseCase.GetIssueById(projectKey, id)
 }
 
 // GetProjectIssues - Returns all Issues of the Project.
 func (s *ApiService) GetProjectIssues(projectKey string) (interface{}, error) {
 	// TODO - update GetProjectIssues with the required logic for this service method.
 	// Add api_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'GetProjectIssues' not implemented")
+	return s.issueUseCase.GetProjectIssues(projectKey)
 }
 
 // UpdateIssue - Update an existing issue
 func (s *ApiService) UpdateIssue(projectKey string, body model.Issue) (interface{}, error) {
 	// TODO - update UpdateIssue with the required logic for this service method.
 	// Add api_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	return nil, errors.New("service method 'UpdateIssue' not implemented")
+	return s.issueUseCase.UpdateIssue(projectKey, body)
 }

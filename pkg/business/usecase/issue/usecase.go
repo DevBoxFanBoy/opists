@@ -1,0 +1,149 @@
+package issue
+
+import (
+	"errors"
+	"fmt"
+	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
+)
+
+type UseCase interface {
+	AddIssue(string, model.Issue) (interface{}, error)
+	DeleteIssue(string, int64) (interface{}, error)
+	GetIssueById(string, int64) (interface{}, error)
+	GetProjectIssues(string) (interface{}, error)
+	UpdateIssue(string, model.Issue) (interface{}, error)
+}
+
+func NewUseCaseController() UseCase {
+	issue := createIssueModel(0)
+	issues := map[string]map[int64]model.Issue{"DF": {0: issue}}
+	return &UseCaseController{issues: issues}
+}
+
+type UseCaseController struct {
+	issues map[string]map[int64]model.Issue
+}
+
+func (u *UseCaseController) AddIssue(projectKey string, issue model.Issue) (interface{}, error) {
+	issueId := *issue.Id
+	//TODO check if project exists in DATA Store here or check before this
+	if _, ok := u.issues[projectKey]; !ok {
+		// maybe this will response 404 in the future
+		u.issues[projectKey] = make(map[int64]model.Issue)
+		issueId = 0
+	}
+	if issueId < 0 {
+		issueId = int64(len(u.issues[projectKey]) + 1)
+	}
+	if _, ok := u.issues[projectKey][issueId]; !ok {
+		u.issues[projectKey][issueId] = issue
+	}
+	return fmt.Sprintf("%v/%v", projectKey, issueId), nil
+}
+
+func (u *UseCaseController) DeleteIssue(projectKey string, id int64) (interface{}, error) {
+	if projectIssues, ok := u.issues[projectKey]; ok {
+		if _, ok := projectIssues[id]; !ok {
+			err := errors.New(fmt.Sprintf("Issue with ID %v not found!", id))
+			return model.ErrorResponse{
+				Code:    404,
+				Message: err.Error(),
+			}, err
+		}
+		delete(projectIssues, id)
+	} else {
+		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
+		return model.ErrorResponse{
+			Code:    404,
+			Message: err.Error(),
+		}, err
+	}
+	return nil, nil
+}
+
+func (u *UseCaseController) GetIssueById(projectKey string, id int64) (interface{}, error) {
+	projectIssues, ok := u.issues[projectKey]
+	if !ok {
+		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
+		return model.ErrorResponse{
+			Code:    404,
+			Message: err.Error(),
+		}, err
+	}
+	issue, ok := projectIssues[id]
+	if !ok {
+		err := errors.New(fmt.Sprintf("Issue with ID %v not found!", id))
+		return model.ErrorResponse{
+			Code:    404,
+			Message: err.Error(),
+		}, err
+	}
+	return issue, nil
+}
+
+func (u *UseCaseController) GetProjectIssues(projectKey string) (interface{}, error) {
+	var issuesModel = model.Issues{}
+	if _, ok := u.issues[projectKey]; !ok {
+		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
+		return model.ErrorResponse{
+			Code:    404,
+			Message: err.Error(),
+		}, err
+	}
+	for _, element := range u.issues[projectKey] {
+		issuesModel.Issues = append(issuesModel.Issues, element)
+	}
+	return issuesModel, nil
+}
+
+func (u *UseCaseController) UpdateIssue(projectKey string, issue model.Issue) (interface{}, error) {
+	if issue.ProjectKey != projectKey {
+		err := errors.New(fmt.Sprintf("Issue's ProjectKey %v is not equal to %v!", issue.ProjectKey, projectKey))
+		return model.ErrorResponse{
+			Code:    400,
+			Message: err.Error(),
+		}, err
+	}
+	projectIssues, ok := u.issues[projectKey]
+	if !ok {
+		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
+		return model.ErrorResponse{
+			Code:    404,
+			Message: err.Error(),
+		}, err
+	}
+	if issue.Id == nil {
+		err := errors.New(fmt.Sprintf("Issue's ID is required!"))
+		return model.ErrorResponse{
+			Code:    400,
+			Message: err.Error(),
+		}, err
+	}
+	if _, ok := projectIssues[*issue.Id]; !ok {
+		err := errors.New(fmt.Sprintf("Issue with ID %v not found!", *issue.Id))
+		return model.ErrorResponse{
+			Code:    404,
+			Message: err.Error(),
+		}, err
+	}
+	projectIssues[*issue.Id] = issue
+	return nil, nil
+}
+
+func createIssueModel(id int64) model.Issue {
+	points := int32(0)
+	return model.Issue{
+		Id:              &id,
+		Name:            "New Bug",
+		Description:     "An error raise when...",
+		Status:          "open",
+		Priority:        "Highest",
+		ProjectKey:      "DF",
+		Components:      []string{"DrinkOwnChampagne", "EatMyOwnApplication"},
+		Sprints:         []string{"Sprint2"},
+		EstimatedPoints: &points,
+		EstimatedTime:   "0h",
+		AffectedVersion: "1.2.3",
+		FixedVersion:    "1.2.4",
+	}
+}

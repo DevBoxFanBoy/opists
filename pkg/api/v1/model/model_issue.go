@@ -10,8 +10,39 @@
 
 package model
 
+type CreationIssue struct {
+	Name string `json:"name"`
+
+	// Issue description Text.
+	Description string `json:"description"`
+
+	// Issue status.
+	Status string `json:"status,omitempty"`
+
+	// Issue priority.
+	Priority string `json:"priority"`
+
+	ProjectKey string `json:"projectKey"`
+
+	Components []string `json:"components,omitempty"`
+
+	Sprints []string `json:"sprints,omitempty"`
+
+	// Issue estimated points of complexity.
+	EstimatedPoints *int32 `json:"estimatedPoints,omitempty"`
+
+	// Issue estimated time until resolved.
+	EstimatedTime string `json:"estimatedTime,omitempty"`
+
+	// Issue affects software version.
+	AffectedVersion string `json:"affectedVersion,omitempty"`
+
+	// Software version that fix this issue.
+	FixedVersion string `json:"fixedVersion,omitempty"`
+}
+
 type Issue struct {
-	Id int64 `json:"id,omitempty"`
+	Id *int64 `json:"id,omitempty"`
 
 	Name string `json:"name"`
 
@@ -31,7 +62,7 @@ type Issue struct {
 	Sprints []string `json:"sprints,omitempty"`
 
 	// Issue estimated points of complexity.
-	EstimatedPoints int32 `json:"estimatedPoints,omitempty"`
+	EstimatedPoints *int32 `json:"estimatedPoints,omitempty"`
 
 	// Issue estimated time until resolved.
 	EstimatedTime string `json:"estimatedTime,omitempty"`

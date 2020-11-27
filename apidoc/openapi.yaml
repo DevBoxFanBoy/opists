@@ -106,6 +106,8 @@ paths:
               $ref: '#/components/schemas/Issue'
         required: true
       responses:
+        204:
+          description: Succesfully updated Issue
         400:
           description: Invalid issue
           content:
@@ -299,6 +301,7 @@ components:
   schemas:
     Issue:
       required:
+        - id
       - name
       - description
       - priority
@@ -308,7 +311,6 @@ components:
         id:
           type: integer
           format: int64
-          readOnly: true
         name:
           type: string
           example: 'New Bug'

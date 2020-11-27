@@ -1,23 +1,61 @@
 package project
 
 import (
+	"errors"
+	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
 	"time"
 )
 
-type UseCase struct {
+type UseCase interface {
+	GetAllProject() (interface{}, error)
+	GetProject(string) (interface{}, error)
+	CreateProject(project model.Project) (interface{}, error)
 }
 
-func (p *UseCase) GetAllProject() (interface{}, error) {
-	prj, err := createProjectModel("DF")
-	if err != nil {
-		return nil, err
+type UseCaseController struct {
+	projects map[string]model.Project
+}
+
+func NewUseCaseController() UseCase {
+	project, _ := createProjectModel("DF")
+	projects := map[string]model.Project{
+		"DF": project,
 	}
-	return model.Projects{Projects: []model.Project{prj}}, nil
+	return &UseCaseController{projects: projects}
 }
 
-func (p *UseCase) GetProject(projectKey string) (interface{}, error) {
-	return createProjectModel(projectKey)
+func (u *UseCaseController) GetAllProject() (interface{}, error) {
+	var projectsModel = model.Projects{}
+	for _, element := range u.projects {
+		projectsModel.Projects = append(projectsModel.Projects, element)
+	}
+	return projectsModel, nil
+}
+
+func (u *UseCaseController) GetProject(projectKey string) (interface{}, error) {
+	project, ok := u.projects[projectKey]
+	if !ok {
+		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
+		return model.ErrorResponse{
+			Code:    404,
+			Message: err.Error(),
+		}, err
+	}
+	return project, nil
+}
+
+func (u *UseCaseController) CreateProject(project model.Project) (interface{}, error) {
+	if _, ok := u.projects[project.Key]; !ok {
+		u.projects[project.Key] = project
+	} else {
+		err := errors.New(fmt.Sprintf("Project with Key %v already exists!", project.Key))
+		return model.ErrorResponse{
+			Code:    409,
+			Message: err.Error(),
+		}, err
+	}
+	return project, nil
 }
 
 func createProjectModel(projectKey string) (model.Project, error) {

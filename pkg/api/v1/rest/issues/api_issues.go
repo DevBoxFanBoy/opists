@@ -12,6 +12,8 @@ package issues
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/router"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
@@ -70,53 +72,91 @@ func (c *ApiController) Routes() router.Routes {
 func (c *ApiController) AddIssue(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	projectKey := params["projectKey"]
-	body := &model.Issue{}
+	if errorResponse, err := validateProjectKey(projectKey); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
+		return
+	}
+	body := &model.CreationIssue{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		router.InternalError(w, err)
 		return
 	}
-
-	result, err := c.service.AddIssue(projectKey, *body)
+	reserve := int64(-1)
+	issue := model.Issue{
+		Id:              &reserve,
+		Name:            body.Name,
+		Description:     body.Description,
+		Status:          body.Status,
+		Priority:        body.Priority,
+		ProjectKey:      body.ProjectKey,
+		Components:      body.Components,
+		Sprints:         body.Sprints,
+		EstimatedPoints: body.EstimatedPoints,
+		EstimatedTime:   body.EstimatedTime,
+		AffectedVersion: body.AffectedVersion,
+		FixedVersion:    body.FixedVersion,
+	}
+	result, err := c.service.AddIssue(projectKey, issue)
 	if err != nil {
 		router.InternalError(w, err)
 		return
 	}
-
-	router.EncodeJSONResponse(result, nil, w)
+	status := http.StatusCreated
+	w.Header().Set("Location", fmt.Sprintf("%v/%v", r.RequestURI, result))
+	router.EncodeJSONResponse(``, &status, w)
 }
 
 // DeleteIssue - Deletes a Issue
 func (c *ApiController) DeleteIssue(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	projectKey := params["projectKey"]
-	id, err := router.ParseIntParameter(params["id"])
-	if err != nil {
-		router.InternalError(w, err)
+	if errorResponse, err := validateProjectKey(projectKey); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
 		return
 	}
-
+	issueId := params["id"]
+	if errorResponse, err := validateIssueId(issueId); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
+		return
+	}
+	id, err := router.ParseIntParameter(issueId)
+	if err != nil {
+		router.BadRequest(w, errors.New(fmt.Sprintf("ID %v is invalid!", issueId)))
+		return
+	}
 	result, err := c.service.DeleteIssue(projectKey, id)
 	if err != nil {
-		router.InternalError(w, err)
+		errRes := result.(model.ErrorResponse)
+		router.HandleErrorResponses(w, errRes)
 		return
 	}
-
-	router.EncodeJSONResponse(result, nil, w)
+	status := http.StatusNoContent
+	router.EncodeJSONResponse(``, &status, w)
 }
 
 // GetIssueById - Find Issue by ID
 func (c *ApiController) GetIssueById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	projectKey := params["projectKey"]
-	id, err := router.ParseIntParameter(params["id"])
-	if err != nil {
-		router.InternalError(w, err)
+	if errorResponse, err := validateProjectKey(projectKey); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
+		return
+	}
+	issueId := params["id"]
+	if errorResponse, err := validateIssueId(issueId); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
+		return
+	}
+	id, err := router.ParseIntParameter(issueId)
+	if err != nil || id < 0 {
+		router.BadRequest(w, errors.New(fmt.Sprintf("ID %v is invalid!", issueId)))
 		return
 	}
 
 	result, err := c.service.GetIssueById(projectKey, id)
 	if err != nil {
-		router.InternalError(w, err)
+		errRes := result.(model.ErrorResponse)
+		router.HandleErrorResponses(w, errRes)
 		return
 	}
 
@@ -127,9 +167,14 @@ func (c *ApiController) GetIssueById(w http.ResponseWriter, r *http.Request) {
 func (c *ApiController) GetProjectIssues(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	projectKey := params["projectKey"]
+	if errorResponse, err := validateProjectKey(projectKey); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
+		return
+	}
 	result, err := c.service.GetProjectIssues(projectKey)
 	if err != nil {
-		router.InternalError(w, err)
+		errRes := result.(model.ErrorResponse)
+		router.HandleErrorResponses(w, errRes)
 		return
 	}
 
@@ -140,17 +185,43 @@ func (c *ApiController) GetProjectIssues(w http.ResponseWriter, r *http.Request)
 func (c *ApiController) UpdateIssue(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	projectKey := params["projectKey"]
+	if errorResponse, err := validateProjectKey(projectKey); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
+		return
+	}
 	body := &model.Issue{}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		router.InternalError(w, err)
 		return
 	}
-
 	result, err := c.service.UpdateIssue(projectKey, *body)
 	if err != nil {
-		router.InternalError(w, err)
+		errRes := result.(model.ErrorResponse)
+		router.HandleErrorResponses(w, errRes)
 		return
 	}
+	status := http.StatusNoContent
+	router.EncodeJSONResponse(``, &status, w)
+}
 
-	router.EncodeJSONResponse(result, nil, w)
+func validateProjectKey(projectKey string) (interface{}, error) {
+	if len(projectKey) == 0 {
+		err := errors.New(fmt.Sprintf("ProjectKey %v is invalid!", projectKey))
+		return model.ErrorResponse{
+			Code:    400,
+			Message: err.Error(),
+		}, err
+	}
+	return nil, nil
+}
+
+func validateIssueId(issueId string) (interface{}, error) {
+	if len(issueId) == 0 {
+		err := errors.New(fmt.Sprintf("Issue ID %v is invalid!", issueId))
+		return model.ErrorResponse{
+			Code:    400,
+			Message: err.Error(),
+		}, err
+	}
+	return nil, nil
 }

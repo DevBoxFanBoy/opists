@@ -1,8 +1,8 @@
 Feature: get one or more projects
-  Show all my projects.
+  Show all my projects and errors whenever project not found.
 
   Scenario: should get all projects
-    When I send "GET" request to "/v1/projects"
+    When I send "GET" request to "/v1/projects" with body ''
     Then the response code should be 200
     And the response should match json:
       """
@@ -40,7 +40,7 @@ Feature: get one or more projects
       """
 
   Scenario: should get one project
-    When I send "GET" request to "/v1/projects/DF"
+    When I send "GET" request to "/v1/projects/DF" with body ''
     Then the response code should be 200
     And the response should match json:
       """
@@ -70,5 +70,16 @@ Feature: get one or more projects
             "end": "2020-11-26T15:18:36.33Z"
           }
         ]
+      }
+      """
+
+  Scenario: should not found project key
+    When I send "GET" request to "/v1/projects/Z0ZZZZZZZZZZZZZZZZZ0" with body ''
+    Then the response code should be 404
+    And the response should match json:
+      """
+      {
+        "code": 404,
+        "message": "Project with Key Z0ZZZZZZZZZZZZZZZZZ0 not found!"
       }
       """

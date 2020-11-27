@@ -11,9 +11,11 @@
 package projects
 
 import (
+	"errors"
 	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/router"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1"
+	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
@@ -61,18 +63,26 @@ func (c *ApiController) GetAllProject(w http.ResponseWriter, r *http.Request) {
 func (c *ApiController) GetProject(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	projectKey := params["projectKey"]
-	if projectKey == "" {
-		router.BadRequest(
-			w,
-			fmt.Errorf("projectKey is required"),
-		)
+	if errorResponse, err := validateProjectKey(projectKey); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
 		return
 	}
 	result, err := c.service.GetProject(projectKey)
 	if err != nil {
-		router.InternalError(w, err)
+		router.NotFoundError(w, err)
 		return
 	}
 
 	router.EncodeJSONResponse(result, nil, w)
+}
+
+func validateProjectKey(projectKey string) (interface{}, error) {
+	if len(projectKey) == 0 {
+		err := errors.New(fmt.Sprintf("ProjectKey %v is invalid!", projectKey))
+		return model.ErrorResponse{
+			Code:    400,
+			Message: err.Error(),
+		}, err
+	}
+	return nil, nil
 }

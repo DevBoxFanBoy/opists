@@ -24,7 +24,7 @@ type ApiService struct {
 
 // NewApiService creates a default api service
 func NewApiService() v1.ProjectsApiServicer {
-	p := project.UseCase{}
+	p := project.NewUseCaseController()
 	return &ApiService{projectUseCase: p}
 }
 
@@ -32,14 +32,10 @@ func NewApiService() v1.ProjectsApiServicer {
 func (s *ApiService) GetAllProject() (interface{}, error) {
 	// GetAllProject with the required logic for this service method.
 	return s.projectUseCase.GetAllProject()
-	// Add api_projects_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	//return nil, errors.New("service method 'GetAllProject' not implemented")
 }
 
 // GetProject - Returns the Project by key
 func (s *ApiService) GetProject(projectKey string) (interface{}, error) {
 	// GetProject with the required logic for this service method.
 	return s.projectUseCase.GetProject(projectKey)
-	// Add api_projects_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-	//return nil, errors.New("service method 'GetProject' not implemented")
 }
