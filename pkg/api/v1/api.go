@@ -12,27 +12,7 @@ package v1
 
 import (
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
-	"net/http"
 )
-
-// IssuesApiRouter defines the required methods for binding the api requests to a responses for the IssuesApi
-// The IssuesApiRouter implementation should parse necessary information from the http request,
-// pass the data to a IssuesApiServicer to perform the required actions, then write the service results to the http response.
-type IssuesApiRouter interface {
-	AddIssue(http.ResponseWriter, *http.Request)
-	DeleteIssue(http.ResponseWriter, *http.Request)
-	GetIssueById(http.ResponseWriter, *http.Request)
-	GetProjectIssues(http.ResponseWriter, *http.Request)
-	UpdateIssue(http.ResponseWriter, *http.Request)
-}
-
-// ProjectsApiRouter defines the required methods for binding the api requests to a responses for the ProjectsApi
-// The ProjectsApiRouter implementation should parse necessary information from the http request,
-// pass the data to a ProjectsApiServicer to perform the required actions, then write the service results to the http response.
-type ProjectsApiRouter interface {
-	GetAllProject(http.ResponseWriter, *http.Request)
-	GetProject(http.ResponseWriter, *http.Request)
-}
 
 // IssuesApiServicer defines the api actions for the IssuesApi service
 // This interface intended to stay up to date with the openapi yaml used to generate it,
