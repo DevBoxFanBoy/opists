@@ -46,7 +46,7 @@ func NewRouter(routers ...Router) *mux.Router {
 			handler = route.HandlerFunc
 			handler = logger.Logger(handler, route.Name)
 
-			router.
+			router.PathPrefix("/rest").
 				Methods(route.Method).
 				Path(route.Pattern).
 				Name(route.Name).
