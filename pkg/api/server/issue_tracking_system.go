@@ -4,6 +4,7 @@ import (
 	"github.com/DevBoxFanBoy/opists/pkg/api/router"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/rest/issues"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/rest/projects"
+	uiResources "github.com/DevBoxFanBoy/opists/pkg/ui/resources"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -16,7 +17,9 @@ func NewIssueTrackingSystemRouterV1() *mux.Router {
 	ProjectsApiService := projects.NewApiService()
 	ProjectsApiController := projects.NewApiController(ProjectsApiService)
 
-	return router.NewRouter(IssuesApiController, ProjectsApiController)
+	r := router.NewRouter(IssuesApiController, ProjectsApiController)
+	router.AddRoutes(r, "/ui/management", uiResources.NewUIController())
+	return r
 }
 
 func NewIssueTrackingSystemServer() {
