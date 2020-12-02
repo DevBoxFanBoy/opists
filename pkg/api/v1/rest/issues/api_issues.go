@@ -81,6 +81,9 @@ func (c *ApiController) AddIssue(w http.ResponseWriter, r *http.Request) {
 		router.InternalError(w, err)
 		return
 	}
+	if len(body.ProjectKey) == 0 {
+		body.ProjectKey = projectKey
+	}
 	reserve := int64(-1)
 	issue := model.Issue{
 		Id:              &reserve,

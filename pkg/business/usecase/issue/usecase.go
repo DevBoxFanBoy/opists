@@ -32,8 +32,16 @@ func (u *UseCaseController) AddIssue(projectKey string, issue model.Issue) (inte
 		u.issues[projectKey] = make(map[int64]model.Issue)
 		issueId = 0
 	}
+	if issue.ProjectKey != projectKey {
+		err := errors.New(fmt.Sprintf("Issue's ProjectKey %v is not equal to %v!", issue.ProjectKey, projectKey))
+		return model.ErrorResponse{
+			Code:    400,
+			Message: err.Error(),
+		}, err
+	}
 	if issueId < 0 {
-		issueId = int64(len(u.issues[projectKey]) + 1)
+		issueId = int64(len(u.issues[projectKey]))
+		issue.Id = &issueId
 	}
 	if _, ok := u.issues[projectKey][issueId]; !ok {
 		u.issues[projectKey][issueId] = issue
