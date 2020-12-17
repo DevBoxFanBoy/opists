@@ -25,7 +25,7 @@ type ApiService struct {
 
 // NewApiService creates a default api service
 func NewApiService() v1.IssuesApiServicer {
-	i := issue.NewUseCaseController()
+	i := issue.GetUseCaseControllerInstance()
 	return &ApiService{issueUseCase: i}
 }
 

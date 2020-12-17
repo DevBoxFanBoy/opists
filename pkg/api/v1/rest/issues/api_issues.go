@@ -101,7 +101,8 @@ func (c *ApiController) AddIssue(w http.ResponseWriter, r *http.Request) {
 	}
 	result, err := c.service.AddIssue(projectKey, issue)
 	if err != nil {
-		router.InternalError(w, err)
+		errRes := result.(model.ErrorResponse)
+		router.HandleErrorResponses(w, errRes)
 		return
 	}
 	status := http.StatusCreated

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
+	"github.com/DevBoxFanBoy/opists/pkg/business/usecase/project"
+	"sync"
 )
 
 type UseCase interface {
@@ -14,10 +16,18 @@ type UseCase interface {
 	UpdateIssue(string, model.Issue) (interface{}, error)
 }
 
-func NewUseCaseController() UseCase {
-	issue := createIssueModel(0)
-	issues := map[string]map[int64]model.Issue{"DF": {0: issue}}
-	return &UseCaseController{issues: issues}
+var once sync.Once
+var instance UseCaseController
+var projectReader project.UseCase
+
+func GetUseCaseControllerInstance() UseCase {
+	once.Do(func() {
+		issue := createIssueModel(0)
+		issues := map[string]map[int64]model.Issue{"DF": {0: issue}}
+		instance = UseCaseController{issues: issues}
+		projectReader = project.GetUseCaseControllerInstance()
+	})
+	return &instance
 }
 
 type UseCaseController struct {
@@ -25,12 +35,8 @@ type UseCaseController struct {
 }
 
 func (u *UseCaseController) AddIssue(projectKey string, issue model.Issue) (interface{}, error) {
-	issueId := *issue.Id
-	//TODO check if project exists in DATA Store here or check before this
-	if _, ok := u.issues[projectKey]; !ok {
-		// maybe this will response 404 in the future
-		u.issues[projectKey] = make(map[int64]model.Issue)
-		issueId = 0
+	if res, err := projectReader.GetProject(projectKey); err != nil {
+		return res, err
 	}
 	if issue.ProjectKey != projectKey {
 		err := errors.New(fmt.Sprintf("Issue's ProjectKey %v is not equal to %v!", issue.ProjectKey, projectKey))
@@ -38,6 +44,11 @@ func (u *UseCaseController) AddIssue(projectKey string, issue model.Issue) (inte
 			Code:    400,
 			Message: err.Error(),
 		}, err
+	}
+	issueId := *issue.Id
+	if _, ok := u.issues[projectKey]; !ok {
+		u.issues[projectKey] = make(map[int64]model.Issue)
+		issueId = 0
 	}
 	if issueId < 0 {
 		issueId = int64(len(u.issues[projectKey]))

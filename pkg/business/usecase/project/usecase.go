@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
+	"sync"
 	"time"
 )
 
@@ -13,16 +14,22 @@ type UseCase interface {
 	CreateProject(project model.Project) (interface{}, error)
 }
 
+var once sync.Once
+var instance UseCaseController
+
 type UseCaseController struct {
 	projects map[string]model.Project
 }
 
-func NewUseCaseController() UseCase {
-	project, _ := createProjectModel("DF")
-	projects := map[string]model.Project{
-		"DF": project,
-	}
-	return &UseCaseController{projects: projects}
+func GetUseCaseControllerInstance() UseCase {
+	once.Do(func() {
+		project, _ := createProjectModel("DF")
+		projects := map[string]model.Project{
+			"DF": project,
+		}
+		instance = UseCaseController{projects: projects}
+	})
+	return &instance
 }
 
 func (u *UseCaseController) GetAllProject() (interface{}, error) {
