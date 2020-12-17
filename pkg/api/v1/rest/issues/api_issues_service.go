@@ -31,36 +31,25 @@ func NewApiService() v1.IssuesApiServicer {
 
 // AddIssue - Add a new issue to the tracking system
 func (s *ApiService) AddIssue(projectKey string, body model.Issue) (interface{}, error) {
-
-	// TODO - update AddIssue with the required logic for this service method.
-	// Add api_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return s.issueUseCase.AddIssue(projectKey, body)
 }
 
 // DeleteIssue - Deletes a Issue
 func (s *ApiService) DeleteIssue(projectKey string, id int64) (interface{}, error) {
-	// TODO - update DeleteIssue with the required logic for this service method.
-	// Add a<pi_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return s.issueUseCase.DeleteIssue(projectKey, id)
 }
 
 // GetIssueById - Find Issue by ID
 func (s *ApiService) GetIssueById(projectKey string, id int64) (interface{}, error) {
-	// TODO - update GetIssueById with the required logic for this service method.
-	// Add api_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return s.issueUseCase.GetIssueById(projectKey, id)
 }
 
 // GetProjectIssues - Returns all Issues of the Project.
 func (s *ApiService) GetProjectIssues(projectKey string) (interface{}, error) {
-	// TODO - update GetProjectIssues with the required logic for this service method.
-	// Add api_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return s.issueUseCase.GetProjectIssues(projectKey)
 }
 
 // UpdateIssue - Update an existing issue
 func (s *ApiService) UpdateIssue(projectKey string, body model.Issue) (interface{}, error) {
-	// TODO - update UpdateIssue with the required logic for this service method.
-	// Add api_issues_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	return s.issueUseCase.UpdateIssue(projectKey, body)
 }

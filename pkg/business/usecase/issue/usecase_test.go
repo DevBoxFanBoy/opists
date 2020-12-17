@@ -2,13 +2,23 @@ package issue
 
 import (
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
+	"github.com/DevBoxFanBoy/opists/pkg/business/usecase/project"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestUseCaseController_AddIssue(t *testing.T) {
-	underTest := UseCaseController{issues: make(map[string]map[int64]model.Issue)}
-	id := int64(0)
+	project.GetUseCaseControllerInstance().CreateProject(
+		model.Project{
+			Key:         "B",
+			Name:        "B",
+			Description: "B",
+			Versions:    nil,
+			Components:  nil,
+			Sprints:     nil,
+		})
+	underTest := GetUseCaseControllerInstance()
+	id := int64(-1)
 	points := int32(0)
 	input := model.Issue{
 		Id:              &id,
@@ -24,15 +34,27 @@ func TestUseCaseController_AddIssue(t *testing.T) {
 		AffectedVersion: "",
 		FixedVersion:    "",
 	}
-	location, err := underTest.AddIssue("A", input)
+	result, err := underTest.AddIssue("B", input)
 	if err != nil {
 		t.Error("Test failed: expect error is nil.", err)
 	}
-	assert.Equal(t, "A/0", location)
+	issue := result.(model.Issue)
+	assert.Equal(t, int64(0), *issue.Id)
+	assert.Equal(t, "B", issue.Name)
+	assert.Equal(t, "C", issue.Description)
+	assert.Equal(t, "", issue.Status)
+	assert.Equal(t, "", issue.Priority)
+	assert.Equal(t, "B", issue.ProjectKey)
+	assert.Nil(t, issue.Components)
+	assert.Nil(t, issue.Sprints)
+	assert.Equal(t, int32(0), *issue.EstimatedPoints)
+	assert.Equal(t, "", issue.EstimatedTime)
+	assert.Equal(t, "", issue.AffectedVersion)
+	assert.Equal(t, "", issue.FixedVersion)
 }
 
 func TestUseCaseController_AddIssue_NotFoundProject(t *testing.T) {
-	underTest := UseCaseController{issues: make(map[string]map[int64]model.Issue)}
+	underTest := GetUseCaseControllerInstance()
 	id := int64(0)
 	points := int32(0)
 	input := model.Issue{
@@ -49,34 +71,44 @@ func TestUseCaseController_AddIssue_NotFoundProject(t *testing.T) {
 		AffectedVersion: "",
 		FixedVersion:    "",
 	}
-	location, err := underTest.AddIssue("A", input)
-	if err != nil {
-		t.Error("Test failed: expect error is nil.", err)
+	result, err := underTest.AddIssue("A", input)
+	if err == nil {
+		t.Error("Test failed: expect error is not nil.", err)
 	}
-	assert.Equal(t, "A/0", location)
+	errorResponse := result.(model.ErrorResponse)
+	assert.Equal(t, "Project with Key A not found!", err.Error())
+	assert.Equal(t, int32(404), errorResponse.Code)
+	assert.Equal(t, "Project with Key A not found!", errorResponse.Message)
 }
 
 func TestUseCaseController_GetIssueById(t *testing.T) {
-	id := int64(0)
+	project.GetUseCaseControllerInstance().CreateProject(
+		model.Project{
+			Key:         "B",
+			Name:        "B",
+			Description: "B",
+			Versions:    nil,
+			Components:  nil,
+			Sprints:     nil,
+		})
+	id := int64(-1)
 	points := int32(0)
-	underTest := UseCaseController{issues: map[string]map[int64]model.Issue{
-		"B": {
-			0: model.Issue{
-				Id:              &id,
-				Name:            "B",
-				Description:     "C",
-				Status:          "",
-				Priority:        "",
-				ProjectKey:      "B",
-				Components:      nil,
-				Sprints:         nil,
-				EstimatedPoints: &points,
-				EstimatedTime:   "",
-				AffectedVersion: "",
-				FixedVersion:    "",
-			},
-		},
-	}}
+	underTest := GetUseCaseControllerInstance()
+	underTest.AddIssue("B", model.Issue{
+		Id:              &id,
+		Name:            "B",
+		Description:     "C",
+		Status:          "",
+		Priority:        "",
+		ProjectKey:      "B",
+		Components:      nil,
+		Sprints:         nil,
+		EstimatedPoints: &points,
+		EstimatedTime:   "",
+		AffectedVersion: "",
+		FixedVersion:    "",
+	})
+
 	result, err := underTest.GetIssueById("B", 0)
 	if err != nil {
 		t.Error("Test failed: expect error is nil.", err)
@@ -98,16 +130,16 @@ func TestUseCaseController_GetIssueById(t *testing.T) {
 }
 
 func TestUseCaseController_GetIssueById_NotFoundProject(t *testing.T) {
-	underTest := UseCaseController{issues: map[string]map[int64]model.Issue{}}
-	result, err := underTest.GetIssueById("B", 0)
+	underTest := GetUseCaseControllerInstance()
+	result, err := underTest.GetIssueById("C", 0)
 	if err == nil {
 		t.Error("Test failed: expect error is not nil.")
 		return
 	}
 	errorResponse := result.(model.ErrorResponse)
-	assert.Equal(t, "Project with Key B not found!", err.Error())
+	assert.Equal(t, "Project with Key C not found!", err.Error())
 	assert.Equal(t, int32(404), errorResponse.Code)
-	assert.Equal(t, "Project with Key B not found!", errorResponse.Message)
+	assert.Equal(t, "Project with Key C not found!", errorResponse.Message)
 }
 
 func TestUseCaseController_GetIssueById_NotFound(t *testing.T) {

@@ -48,7 +48,6 @@ func (u *UseCaseController) AddIssue(projectKey string, issue model.Issue) (inte
 	issueId := *issue.Id
 	if _, ok := u.issues[projectKey]; !ok {
 		u.issues[projectKey] = make(map[int64]model.Issue)
-		issueId = 0
 	}
 	if issueId < 0 {
 		issueId = int64(len(u.issues[projectKey]))
@@ -57,7 +56,7 @@ func (u *UseCaseController) AddIssue(projectKey string, issue model.Issue) (inte
 	if _, ok := u.issues[projectKey][issueId]; !ok {
 		u.issues[projectKey][issueId] = issue
 	}
-	return fmt.Sprintf("%v/%v", projectKey, issueId), nil
+	return issue, nil
 }
 
 func (u *UseCaseController) DeleteIssue(projectKey string, id int64) (interface{}, error) {

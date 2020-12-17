@@ -105,6 +105,28 @@ Feature: get one or more issues from projects or by id
     When I send "POST" request to "/rest/v1/projects/DF/issues" with body '{"name":"New Bug2","description":"2 description","status":"open","priority":"Highest","projectKey":"DF","components":["DrinkOwnChampagne","EatMyOwnApplication"],"sprints":["Sprint2"],"estimatedPoints":0,"estimatedTime":"0h","affectedVersion":"1.2.3","fixedVersion":"1.2.4"}'
     Then the response code should be 201
     And the response header "Location" match value "/DF/1"
+    And the response should match json:
+      """
+      {
+        "id": 1,
+        "name": "New Bug2",
+        "description": "2 description",
+        "status": "open",
+        "priority": "Highest",
+        "projectKey": "DF",
+        "components": [
+          "DrinkOwnChampagne",
+          "EatMyOwnApplication"
+        ],
+        "sprints": [
+          "Sprint2"
+        ],
+        "estimatedPoints": 0,
+        "estimatedTime": "0h",
+        "affectedVersion": "1.2.3",
+        "fixedVersion": "1.2.4"
+      }
+      """
 
 #update issue
 

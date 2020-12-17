@@ -106,8 +106,9 @@ func (c *ApiController) AddIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	status := http.StatusCreated
-	w.Header().Set("Location", fmt.Sprintf("%v/%v", r.RequestURI, result))
-	router.EncodeJSONResponse(``, &status, w)
+	issue = result.(model.Issue)
+	w.Header().Set("Location", fmt.Sprintf("%v/%v/%v", r.RequestURI, issue.ProjectKey, *issue.Id))
+	router.EncodeJSONResponse(result, &status, w)
 }
 
 // DeleteIssue - Deletes a Issue

@@ -172,7 +172,6 @@ paths:
                 example: "https://localhost:8080/v1/projects/DF/issues/0"
           content:
             application/json:
-              
               schema:
                 $ref: '#/components/schemas/Issue'
         400:
