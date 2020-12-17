@@ -1,7 +1,7 @@
 Feature: get one or more projects
   Show all my projects and errors whenever project not found.
 
-  Scenario: should get all projects
+  Scenario: get all projects
     When I send "GET" request to "/rest/v1/projects" with body ''
     Then the response code should be 200
     And the response should match json:
@@ -39,7 +39,7 @@ Feature: get one or more projects
       }
       """
 
-  Scenario: should get one project
+  Scenario: get one project
     When I send "GET" request to "/rest/v1/projects/DF" with body ''
     Then the response code should be 200
     And the response should match json:
@@ -73,7 +73,7 @@ Feature: get one or more projects
       }
       """
 
-  Scenario: should not found project key
+  Scenario: not found project key for project
     When I send "GET" request to "/rest/v1/projects/Z0ZZZZZZZZZZZZZZZZZ0" with body ''
     Then the response code should be 404
     And the response should match json:
