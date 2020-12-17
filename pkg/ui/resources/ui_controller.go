@@ -4,7 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/router"
+	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
+	"github.com/DevBoxFanBoy/opists/pkg/business/usecase/issue"
+	"github.com/DevBoxFanBoy/opists/pkg/business/usecase/project"
 	"github.com/gorilla/mux"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -13,10 +17,14 @@ import (
 
 // A UIController binds http requests to an UI service and writes the service results to the http response
 type UIController struct {
+	projectUseCase project.UseCase
+	issueUseCase   issue.UseCase
 }
 
 func NewUIController() router.Router {
-	return &UIController{}
+	p := project.GetUseCaseControllerInstance()
+	i := issue.GetUseCaseControllerInstance()
+	return &UIController{projectUseCase: p, issueUseCase: i}
 }
 
 // Routes returns all of the api route for the UIController
@@ -50,13 +58,40 @@ func (u *UIController) Routes() router.Routes {
 }
 
 func (u *UIController) GetIndex(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadFile("ui/management/index.html")
+	df, err := u.projectUseCase.GetProject("DF")
+	if err != nil {
+		t, e := template.ParseFiles("ui/management/500.html")
+		if e != nil {
+			HardInternalServerError(w, e)
+			return
+		}
+		t.Execute(w, struct{ ErrorStr string }{e.Error()})
+		return
+	}
+	issues, err := u.issueUseCase.GetProjectIssues("DF")
+	if err != nil {
+		t, e := template.ParseFiles("ui/management/500.html")
+		if e != nil {
+			HardInternalServerError(w, e)
+			return
+		}
+		t.Execute(w, struct{ ErrorStr string }{e.Error()})
+		return
+	}
+	is := issues.(model.Issues)
+	data := struct {
+		Project     model.Project
+		Issues      model.Issues
+		IssuesCount int
+	}{Project: df.(model.Project), Issues: is, IssuesCount: len(is.Issues)}
+	t, err := template.ParseFiles("ui/management/index.html")
 	if err != nil {
 		HardInternalServerError(w, err)
 		return
 	}
-	fmt.Fprintf(w, "%s", body)
+	t.Execute(w, data)
 }
+
 func (u *UIController) GetJSResource(w http.ResponseWriter, r *http.Request) {
 	loadResource(w, r, "js", "application/javascript")
 }
