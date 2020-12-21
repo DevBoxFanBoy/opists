@@ -37,6 +37,12 @@ func (u *UIController) Routes() router.Routes {
 			u.GetIndex,
 		},
 		{
+			"GetIssuesFromProject",
+			strings.ToUpper("Get"),
+			"/{projectKey}/issues.html",
+			u.GetIssuesFromProject,
+		},
+		{
 			"GetJSResource",
 			strings.ToUpper("Get"),
 			"/js/{resource}",
@@ -58,7 +64,37 @@ func (u *UIController) Routes() router.Routes {
 }
 
 func (u *UIController) GetIndex(w http.ResponseWriter, r *http.Request) {
-	df, err := u.projectUseCase.GetProject("DF")
+	allPrjs, err := u.projectUseCase.GetAllProject()
+	if err != nil {
+		t, e := template.ParseFiles("ui/management/500.html")
+		if e != nil {
+			HardInternalServerError(w, e)
+			return
+		}
+		t.Execute(w, struct{ ErrorStr string }{e.Error()})
+		return
+	}
+	prjs := allPrjs.(model.Projects)
+	data := struct {
+		Projects     model.Projects
+		ProjectCount int
+	}{Projects: prjs, ProjectCount: len(prjs.Projects)}
+	t, err := template.ParseFiles("ui/management/index.html")
+	if err != nil {
+		HardInternalServerError(w, err)
+		return
+	}
+	t.Execute(w, data)
+}
+
+func (u *UIController) GetIssuesFromProject(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	projectKey := params["projectKey"]
+	if err := validateParameter(projectKey, "ProjectKey"); err != nil {
+		HardNotFound(w)
+		return
+	}
+	df, err := u.projectUseCase.GetProject(projectKey)
 	if err != nil {
 		t, e := template.ParseFiles("ui/management/500.html")
 		if e != nil {
@@ -84,7 +120,7 @@ func (u *UIController) GetIndex(w http.ResponseWriter, r *http.Request) {
 		Issues      model.Issues
 		IssuesCount int
 	}{Project: df.(model.Project), Issues: is, IssuesCount: len(is.Issues)}
-	t, err := template.ParseFiles("ui/management/index.html")
+	t, err := template.ParseFiles("ui/management/issues.html")
 	if err != nil {
 		HardInternalServerError(w, err)
 		return
@@ -115,12 +151,16 @@ func (u *UIController) GetAssetsResource(w http.ResponseWriter, r *http.Request)
 	loadResource(w, r, assets, contentType)
 }
 
-func validateResource(resource string) error {
-	if len(resource) == 0 {
-		err := errors.New(fmt.Sprintf("Resource %v is invalid!", resource))
+func validateParameter(parameter string, what string) error {
+	if len(parameter) == 0 {
+		err := errors.New(fmt.Sprintf("%v %v is invalid!", what, parameter))
 		return err
 	}
 	return nil
+}
+
+func validateResource(resource string) error {
+	return validateParameter(resource, "Resource")
 }
 
 func loadResource(w http.ResponseWriter, r *http.Request, folder string, contentType string) {

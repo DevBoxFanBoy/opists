@@ -7,7 +7,7 @@
     <meta name="description" content=""/>
     <meta name="author" content=""/>
     <title>Dashboard - OS Issue Träcking System</title>
-    <link href="css/styles.css" rel="stylesheet"/>
+    <link href="/ui/management/css/styles.css" rel="stylesheet"/>
     <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet"
           crossorigin="anonymous"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"
@@ -15,12 +15,9 @@
 </head>
 <body class="sb-nav-fixed">
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-    <a class="navbar-brand" href="index.html">
-        Issue<img src="assets/img/logo.png" alt="Issue Träcking System" style="width:40px;">räcking
+    <a class="navbar-brand" href="/ui/management/index.html">
+        Issue<img src="/ui/management/assets/img/logo.png" alt="Issue Träcking System" style="width:40px;">räcking
     </a>
-    <!-- HERE USER SHOULD HAS PERMISSION -->
-    <a href="#" class="btn btn-primary" role="button">Create Project</a>
-    <span class="text-dark">_</span>
     <!-- HERE USER SHOULD HAS PERMISSION -->
     <a href="#" class="btn btn-primary" role="button">Create Issue</a>
     <span class="text-dark">_</span>
@@ -46,14 +43,14 @@
         <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
             <div class="sb-sidenav-menu">
                 <div class="nav">
-                    <div class="sb-sidenav-menu-heading">Overview</div>
+                    <div class="sb-sidenav-menu-heading">Project</div>
                     <a class="nav-link" href="#">
                         <div class="sb-nav-link-icon"><i class="fas fa-th-list"></i> Boards</div>
                         <span class="badge badge-light">0</span>
                     </a>
-                    <a class="nav-link" href="/ui/management/index.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i> Projects</div>
-                        <span class="badge badge-light">{{.ProjectCount}}</span>
+                    <a class="nav-link" href="/ui/management/{{.Project.Key}}/issues.html">
+                        <div class="sb-nav-link-icon"><i class="fas fa-bug"></i> Issues</div>
+                        <span class="badge badge-light">{{.IssuesCount}}</span>
                     </a>
                 </div>
             </div>
@@ -70,19 +67,40 @@
                 <div class="row">
                     <div class="col-sm">
                         <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table mr-1"></i>
+                                {{.Project.Name}} Issues:
+                            </div>
                             <div class="card-body">
                                 <div class="list-group">
-                                    {{range .Projects.Projects}}
+                                    {{range .Issues.Issues}}
                                         <a class="list-group-item list-group-item-action list-group-item-dark"
-                                           href="/ui/management/{{.Key}}/issues.html">
-                                            <i class="fas fa-table mr-1"></i>
-                                            {{.Key}} {{.Name}}
+                                           data-toggle="collapse" href="#collapseExample{{.Id}}" role="button">
+                                            <i class="fas fa-bug"></i>
+                                            {{.ProjectKey}}-{{.Id}} {{.Name}}
                                         </a>
                                     {{end}}
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {{range .Issues.Issues}}
+                        <div class="collapse" id="collapseExample{{.Id}}">
+                            <div class="col">
+                                <div class="card" style="width:600px">
+                                    <div class="card-header bg-dark text-white">{{.ProjectKey}}-{{.Id}} {{.Name}}</div>
+                                    <div class="card-body">Description:<p>{{.Description}}
+                                        <p>
+                                            AffectedVersion:
+                                        <p>{{.AffectedVersion}}
+                                        <p>
+                                            FixedVersion:
+                                        <p>{{.FixedVersion}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {{end}}
                 </div>
             </div>
         </main>
@@ -103,7 +121,7 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"></script>
-<script src="js/scripts.js"></script>
+<script src="/ui/management/js/scripts.js"></script>
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
 </body>
