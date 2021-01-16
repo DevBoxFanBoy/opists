@@ -12,6 +12,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
 	"github.com/DevBoxFanBoy/opists/pkg/logger"
 	"github.com/gorilla/mux"
@@ -71,6 +72,19 @@ func AddRoutes(router *mux.Router, prefix string, routers ...Router) {
 				Handler(handler)
 		}
 	}
+}
+
+func AddFaviconRoute(router *mux.Router) {
+	router.Methods("GET").Path("/favicon.ico").HandlerFunc(GetFaviconResource)
+}
+
+func GetFaviconResource(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadFile("favicon.ico")
+	if err != nil {
+		http.Error(w, http.StatusText(404), 404)
+		return
+	}
+	fmt.Fprintf(w, "%s", body)
 }
 
 // EncodeJSONResponse uses the json encoder to write an interface to the http response with an optional status code
