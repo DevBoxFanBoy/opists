@@ -12,10 +12,19 @@ package main
 
 import (
 	"github.com/DevBoxFanBoy/opists/pkg/api/server"
+	"github.com/DevBoxFanBoy/opists/pkg/config"
+	"github.com/ilyakaznacheev/cleanenv"
 	"log"
+	"os"
 )
 
 func main() {
+	var cfg config.Config
+	err := cleanenv.ReadConfig("config.yml", &cfg)
+	if err != nil {
+		log.Printf("Server config error: %s", err)
+		os.Exit(1)
+	}
 	log.Printf("Server started")
-	server.NewIssueTrackingSystemServer()
+	server.NewIssueTrackingSystemServer(cfg)
 }

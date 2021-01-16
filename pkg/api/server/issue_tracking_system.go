@@ -1,9 +1,11 @@
 package server
 
 import (
+	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/router"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/rest/issues"
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/rest/projects"
+	"github.com/DevBoxFanBoy/opists/pkg/config"
 	uiResources "github.com/DevBoxFanBoy/opists/pkg/ui/resources"
 	"github.com/gorilla/mux"
 	"log"
@@ -22,6 +24,7 @@ func NewIssueTrackingSystemRouterV1() *mux.Router {
 	return r
 }
 
-func NewIssueTrackingSystemServer() {
-	log.Fatal(http.ListenAndServe(":8080", NewIssueTrackingSystemRouterV1()))
+func NewIssueTrackingSystemServer(config config.Config) {
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port),
+		NewIssueTrackingSystemRouterV1()))
 }
