@@ -22,6 +22,7 @@ func NewIssueTrackingSystemRouterV1() *mux.Router {
 	r := router.NewRouter(IssuesApiController, ProjectsApiController)
 	router.AddRoutes(r, "/ui/management", uiResources.NewUIController())
 	router.AddFaviconRoute(r)
+	router.AddPProf(r)
 	return r
 }
 
