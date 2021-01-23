@@ -1,11 +1,39 @@
-# Open Source Issue Tracking System - opists
-Manage your project issues.
+# Open Source Issue Träcking System - opists
+Track the bugs of your software projects.
+Plan new features simply and easily via the user interface*. REST APIs are also available for developers.
 
-## Build
-[see here](apidoc/Build.md)
+\* The user interface is work in progress.
+
+## Planned features:
+UI for create projects and manage issues same as REST API.
+
+Reinforce opists with the [postgresql database](https://www.postgresql.org/).
+
+User management.
+* Add/Read/Update/Delete users via REST API and UI.
+* Assign roles to users/Remove roles from users/List roles of users.
+* Add/Read/Update/Delete members of projects.
+
+The projects can be planned using roadmaps for all components and versions.
+
+Boards for agile development (focused on Scrum).
+* Backlog Board
+* Sprint Backlog Board
+* Kanban Board (todo, in progress, done)
+* Roadmap Board
+* Tester Board
+
+Testers can plan and execute a test cycle.
+DevOps can evaluate metrics via [prometheus](https://prometheus.io/).
+
+# User Interface
+see [ui/docs/UserInterface.md](ui/docs/UserInterface.md)
+
+# Build
+see [apidoc/Build.md](apidoc/Build.md)
 
 ## Testing API with cucumber godog
-
+Switch to the test folder and execute:
 ```
 cd test/api
 go test
