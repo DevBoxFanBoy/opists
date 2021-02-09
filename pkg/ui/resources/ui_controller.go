@@ -7,6 +7,8 @@ import (
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
 	"github.com/DevBoxFanBoy/opists/pkg/business/usecase/issue"
 	"github.com/DevBoxFanBoy/opists/pkg/business/usecase/project"
+	"github.com/DevBoxFanBoy/opists/pkg/ui"
+	"github.com/DevBoxFanBoy/opists/pkg/ui/projects"
 	"github.com/gorilla/mux"
 	"html/template"
 	"io/ioutil"
@@ -37,6 +39,18 @@ func (u *UIController) Routes() router.Routes {
 			u.GetIndex,
 		},
 		{
+			"GetAllProjects",
+			strings.ToUpper("Get"),
+			"/projects.html",
+			u.GetIndex,
+		},
+		{
+			"CreateProject",
+			strings.ToUpper("Post"),
+			"/projects.html",
+			u.CreateProject,
+		},
+		{
 			"GetIssuesFromProject",
 			strings.ToUpper("Get"),
 			"/{projectKey}/issues.html",
@@ -64,51 +78,35 @@ func (u *UIController) Routes() router.Routes {
 }
 
 func (u *UIController) GetIndex(w http.ResponseWriter, r *http.Request) {
-	allPrjs, err := u.projectUseCase.GetAllProject()
-	if err != nil {
-		t, e := template.ParseFiles("ui/management/500.html")
-		if e != nil {
-			HardInternalServerError(w, e)
-			return
-		}
-		t.Execute(w, struct{ ErrorStr string }{e.Error()})
-		return
-	}
-	prjs := allPrjs.(model.Projects)
-	data := struct {
-		Projects     model.Projects
-		ProjectCount int
-	}{Projects: prjs, ProjectCount: len(prjs.Projects)}
-	t, err := template.ParseFiles("ui/management/index.html")
-	if err != nil {
-		HardInternalServerError(w, err)
-		return
-	}
-	t.Execute(w, data)
+	projects.GetAllProject(w, r, u.projectUseCase)
+}
+
+func (u *UIController) CreateProject(w http.ResponseWriter, r *http.Request) {
+	projects.CreateProjectForm(w, r, u.projectUseCase)
 }
 
 func (u *UIController) GetIssuesFromProject(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	projectKey := params["projectKey"]
 	if err := validateParameter(projectKey, "ProjectKey"); err != nil {
-		HardNotFound(w)
+		ui.HardNotFound(w)
 		return
 	}
 	df, err := u.projectUseCase.GetProject(projectKey)
 	if err != nil {
 		t, e := template.ParseFiles("ui/management/500.html")
 		if e != nil {
-			HardInternalServerError(w, e)
+			ui.HardInternalServerError(w, e)
 			return
 		}
 		t.Execute(w, struct{ ErrorStr string }{e.Error()})
 		return
 	}
-	issues, err := u.issueUseCase.GetProjectIssues("DF")
+	issues, err := u.issueUseCase.GetProjectIssues(projectKey)
 	if err != nil {
 		t, e := template.ParseFiles("ui/management/500.html")
 		if e != nil {
-			HardInternalServerError(w, e)
+			ui.HardInternalServerError(w, e)
 			return
 		}
 		t.Execute(w, struct{ ErrorStr string }{e.Error()})
@@ -122,7 +120,7 @@ func (u *UIController) GetIssuesFromProject(w http.ResponseWriter, r *http.Reque
 	}{Project: df.(model.Project), Issues: is, IssuesCount: len(is.Issues)}
 	t, err := template.ParseFiles("ui/management/issues.html")
 	if err != nil {
-		HardInternalServerError(w, err)
+		ui.HardInternalServerError(w, err)
 		return
 	}
 	t.Execute(w, data)
@@ -140,7 +138,7 @@ func (u *UIController) GetAssetsResource(w http.ResponseWriter, r *http.Request)
 	params := mux.Vars(r)
 	folder := params["folder"]
 	if err := validateResource(folder); err != nil {
-		HardNotFound(w)
+		ui.HardNotFound(w)
 		return
 	}
 	contentType := ""
@@ -167,33 +165,21 @@ func loadResource(w http.ResponseWriter, r *http.Request, folder string, content
 	params := mux.Vars(r)
 	resource := params["resource"]
 	if err := validateResource(resource); err != nil {
-		HardNotFound(w)
+		ui.HardNotFound(w)
 		return
 	}
 	if err := validateResource(folder); err != nil {
-		HardFolderNotFound(w, folder)
+		ui.HardFolderNotFound(w, folder)
 		return
 	}
 	filename := fmt.Sprintf("ui/management/%v/%v", folder, resource)
 	body, err := ioutil.ReadFile(filename)
 	if err != nil {
-		HardInternalServerError(w, err)
+		ui.HardInternalServerError(w, err)
 		return
 	}
 	if len(contentType) > 0 {
 		w.Header().Add("Content-Type", contentType)
 	}
 	fmt.Fprintf(w, "%s", body)
-}
-
-func HardInternalServerError(w http.ResponseWriter, err error) {
-	fmt.Fprintf(w, "<h1>%s</h1><div>%s</div>", "500 Internal Server Error", err.Error())
-}
-
-func HardNotFound(w http.ResponseWriter) {
-	fmt.Fprintf(w, "<h1>%s</h1>", "404 Not Found")
-}
-
-func HardFolderNotFound(w http.ResponseWriter, folder string) {
-	fmt.Fprintf(w, "<h1>%s</h1><div>Folder: %s</div>", "404 Not Found", folder)
 }

@@ -154,6 +154,9 @@ func HandleErrorResponses(w http.ResponseWriter, errorResponse model.ErrorRespon
 		return
 	case 404:
 		NotFoundErrorResponse(w, errorResponse)
+		return
+	case 409:
+		ConflictErrorResponse(w, errorResponse)
 	default:
 		InternalErrorResponse(w, errorResponse)
 		return
@@ -162,6 +165,11 @@ func HandleErrorResponses(w http.ResponseWriter, errorResponse model.ErrorRespon
 
 func NotFoundErrorResponse(w http.ResponseWriter, errorResponse model.ErrorResponse) {
 	status := http.StatusNotFound
+	EncodeJSONResponse(errorResponse, &status, w)
+}
+
+func ConflictErrorResponse(w http.ResponseWriter, errorResponse model.ErrorResponse) {
+	status := http.StatusConflict
 	EncodeJSONResponse(errorResponse, &status, w)
 }
 

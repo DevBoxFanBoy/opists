@@ -20,11 +20,12 @@ import (
 
 func main() {
 	var cfg config.Config
-	err := cleanenv.ReadConfig("config.yml", &cfg)
-	if err != nil {
+	if err := cleanenv.ReadConfig("config.yml", &cfg); err != nil {
 		log.Printf("Server config error: %s", err)
 		os.Exit(1)
 	}
-	log.Printf("Server started")
-	server.NewIssueTrackingSystemServer(cfg)
+	log.Printf("Server starting...")
+	if err := server.NewIssueTrackingSystemServer(cfg); err != nil {
+		log.Fatal(err)
+	}
 }

@@ -12,6 +12,7 @@ package projects
 
 import (
 	"github.com/DevBoxFanBoy/opists/pkg/api/v1"
+	"github.com/DevBoxFanBoy/opists/pkg/api/v1/model"
 	"github.com/DevBoxFanBoy/opists/pkg/business/usecase/project"
 )
 
@@ -34,8 +35,21 @@ func (s *ApiService) GetAllProject() (interface{}, error) {
 	return s.projectUseCase.GetAllProject()
 }
 
+// CreateProject - Create a new Project
+func (s *ApiService) CreateProject(project model.Project) (interface{}, error) {
+	return s.projectUseCase.CreateProject(project)
+}
+
 // GetProject - Returns the Project by key
 func (s *ApiService) GetProject(projectKey string) (interface{}, error) {
 	// GetProject with the required logic for this service method.
 	return s.projectUseCase.GetProject(projectKey)
+}
+
+func (s *ApiService) UpdateProject(projectKey string, project model.Project) (interface{}, error) {
+	return s.projectUseCase.UpdateProject(projectKey, project)
+}
+
+func (s *ApiService) DeleteProject(projectKey string) (interface{}, error) {
+	return s.projectUseCase.DeleteProject(projectKey)
 }

@@ -60,75 +60,54 @@ func (u *UseCaseController) AddIssue(projectKey string, issue model.Issue) (inte
 }
 
 func (u *UseCaseController) DeleteIssue(projectKey string, id int64) (interface{}, error) {
-	if projectIssues, ok := u.issues[projectKey]; ok {
-		if _, ok := projectIssues[id]; !ok {
-			err := errors.New(fmt.Sprintf("Issue with ID %v not found!", id))
-			return model.ErrorResponse{
-				Code:    404,
-				Message: err.Error(),
-			}, err
-		}
-		delete(projectIssues, id)
-	} else {
-		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
-		return model.ErrorResponse{
-			Code:    404,
-			Message: err.Error(),
-		}, err
+	if res, err := projectReader.GetProject(projectKey); err != nil {
+		return res, err
 	}
-	return nil, nil
+	if projectIssues, ok := u.issues[projectKey]; ok {
+		if _, ok := projectIssues[id]; ok {
+			delete(projectIssues, id)
+			return nil, nil
+		}
+	}
+	err := errors.New(fmt.Sprintf("Issue with ID %v not found!", id))
+	return model.ErrorResponse{
+		Code:    404,
+		Message: err.Error(),
+	}, err
 }
 
 func (u *UseCaseController) GetIssueById(projectKey string, id int64) (interface{}, error) {
-	projectIssues, ok := u.issues[projectKey]
-	if !ok {
-		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
-		return model.ErrorResponse{
-			Code:    404,
-			Message: err.Error(),
-		}, err
+	if res, err := projectReader.GetProject(projectKey); err != nil {
+		return res, err
 	}
-	issue, ok := projectIssues[id]
-	if !ok {
-		err := errors.New(fmt.Sprintf("Issue with ID %v not found!", id))
-		return model.ErrorResponse{
-			Code:    404,
-			Message: err.Error(),
-		}, err
+	if projectIssues, ok := u.issues[projectKey]; ok {
+		if issue, ok := projectIssues[id]; ok {
+			return issue, nil
+		}
 	}
-	return issue, nil
+	err := errors.New(fmt.Sprintf("Issue with ID %v not found!", id))
+	return model.ErrorResponse{
+		Code:    404,
+		Message: err.Error(),
+	}, err
 }
 
 func (u *UseCaseController) GetProjectIssues(projectKey string) (interface{}, error) {
-	var issuesModel = model.Issues{}
-	if _, ok := u.issues[projectKey]; !ok {
-		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
-		return model.ErrorResponse{
-			Code:    404,
-			Message: err.Error(),
-		}, err
+	if res, err := projectReader.GetProject(projectKey); err != nil {
+		return res, err
 	}
-	for _, element := range u.issues[projectKey] {
-		issuesModel.Issues = append(issuesModel.Issues, element)
+	var issuesModel = model.Issues{}
+	if projectIssues, ok := u.issues[projectKey]; ok {
+		for _, element := range projectIssues {
+			issuesModel.Issues = append(issuesModel.Issues, element)
+		}
 	}
 	return issuesModel, nil
 }
 
 func (u *UseCaseController) UpdateIssue(projectKey string, issue model.Issue) (interface{}, error) {
-	if issue.ProjectKey != projectKey {
-		err := errors.New(fmt.Sprintf("Issue's ProjectKey %v is not equal to %v!", issue.ProjectKey, projectKey))
-		return model.ErrorResponse{
-			Code:    400,
-			Message: err.Error(),
-		}, err
-	}
-	projectIssues, ok := u.issues[projectKey]
-	if !ok {
-		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
-		return model.ErrorResponse{
-			Code:    404,
-			Message: err.Error(),
-		}, err
+	if res, err := projectReader.GetProject(projectKey); err != nil {
+		return res, err
 	}
 	if issue.Id == nil {
 		err := errors.New(fmt.Sprintf("Issue's ID is required!"))
@@ -137,14 +116,23 @@ func (u *UseCaseController) UpdateIssue(projectKey string, issue model.Issue) (i
 			Message: err.Error(),
 		}, err
 	}
-	if _, ok := projectIssues[*issue.Id]; !ok {
-		err := errors.New(fmt.Sprintf("Issue with ID %v not found!", *issue.Id))
+	if issue.ProjectKey != projectKey {
+		err := errors.New(fmt.Sprintf("Issue's ProjectKey %v is not equal to %v!", issue.ProjectKey, projectKey))
 		return model.ErrorResponse{
-			Code:    404,
+			Code:    400,
 			Message: err.Error(),
 		}, err
 	}
-	projectIssues[*issue.Id] = issue
+	if projectIssues, ok := u.issues[projectKey]; ok {
+		if _, ok := projectIssues[*issue.Id]; !ok {
+			err := errors.New(fmt.Sprintf("Issue with ID %v not found!", *issue.Id))
+			return model.ErrorResponse{
+				Code:    404,
+				Message: err.Error(),
+			}, err
+		}
+		projectIssues[*issue.Id] = issue
+	}
 	return nil, nil
 }
 

@@ -12,6 +12,8 @@ type UseCase interface {
 	GetAllProject() (interface{}, error)
 	GetProject(string) (interface{}, error)
 	CreateProject(project model.Project) (interface{}, error)
+	UpdateProject(projectKey string, project model.Project) (interface{}, error)
+	DeleteProject(projectKey string) (interface{}, error)
 }
 
 var once sync.Once
@@ -63,6 +65,39 @@ func (u *UseCaseController) CreateProject(project model.Project) (interface{}, e
 		}, err
 	}
 	return project, nil
+}
+
+func (u *UseCaseController) UpdateProject(projectKey string, project model.Project) (interface{}, error) {
+	if projectKey != project.Key {
+		err := errors.New(fmt.Sprintf("Project's Key %v is not equal to %v!", project.Key, projectKey))
+		return model.ErrorResponse{
+			Code:    400,
+			Message: err.Error(),
+		}, err
+	}
+	if _, ok := u.projects[project.Key]; !ok {
+		err := errors.New(fmt.Sprintf("Project with Key %v not found!", project.Key))
+		return model.ErrorResponse{
+			Code:    404,
+			Message: err.Error(),
+		}, err
+	}
+	u.projects[project.Key] = project
+	return nil, nil
+}
+
+func (u *UseCaseController) DeleteProject(projectKey string) (interface{}, error) {
+	_, ok := u.projects[projectKey]
+	if !ok {
+		err := errors.New(fmt.Sprintf("Project with Key %v not found!", projectKey))
+		return model.ErrorResponse{
+			Code:    404,
+			Message: err.Error(),
+		}, err
+	}
+	delete(u.projects, projectKey)
+	//TODO delete all issues of this project, too
+	return nil, nil
 }
 
 func createProjectModel(projectKey string) (model.Project, error) {

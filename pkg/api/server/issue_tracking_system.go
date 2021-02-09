@@ -26,7 +26,9 @@ func NewIssueTrackingSystemRouterV1() *mux.Router {
 	return r
 }
 
-func NewIssueTrackingSystemServer(config config.Config) {
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port),
-		NewIssueTrackingSystemRouterV1()))
+func NewIssueTrackingSystemServer(config config.Config) error {
+	address := fmt.Sprintf("%s:%s", config.Server.Host, config.Server.Port)
+	log.Println(fmt.Sprintf("Server bind to address: %s", address))
+	err := http.ListenAndServe(address, NewIssueTrackingSystemRouterV1())
+	return err
 }
