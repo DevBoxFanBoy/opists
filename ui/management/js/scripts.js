@@ -19,4 +19,24 @@
         e.preventDefault();
         $("body").toggleClass("sb-sidenav-toggled");
     });
+
+    // Create new Project
+    $("#createProject").on("click", function (e) {
+        e.preventDefault()
+        let newProject = JSON.stringify({
+            key: $("#prjKeyField").val(),
+            name: $("#prjNameField").val(),
+            description: $("#prjDescriptionField").val()
+        });
+        $.ajax({
+            type: "POST",
+            url: "/rest/v1/projects",
+            data: newProject,
+            success: function () {
+                location.reload();
+            },
+            dataType: "json",
+            contentType: "application/json"
+        });
+    })
 })(jQuery);

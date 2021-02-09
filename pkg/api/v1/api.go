@@ -33,4 +33,7 @@ type IssuesApiServicer interface {
 type ProjectsApiServicer interface {
 	GetAllProject() (interface{}, error)
 	GetProject(string) (interface{}, error)
+	UpdateProject(string, model.Project) (interface{}, error)
+	CreateProject(project model.Project) (interface{}, error)
+	DeleteProject(projectKey string) (interface{}, error)
 }

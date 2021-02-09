@@ -11,6 +11,7 @@
 package projects
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/router"
@@ -41,10 +42,27 @@ func (c *ApiController) Routes() router.Routes {
 			c.GetAllProject,
 		},
 		{
+			"CreateProject",
+			strings.ToUpper("Post"),
+			"/v1/projects",
+			c.CreateProject,
+		},
+		{
 			"GetProject",
 			strings.ToUpper("Get"),
 			"/v1/projects/{projectKey}",
 			c.GetProject,
+		},
+		{
+			"UpdateProject",
+			strings.ToUpper("Put"),
+			"/v1/projects/{projectKey}",
+			c.UpdateProject,
+		}, {
+			"DeleteProject",
+			strings.ToUpper("Delete"),
+			"/v1/projects/{projectKey}",
+			c.DeleteProject,
 		},
 	}
 }
@@ -72,8 +90,69 @@ func (c *ApiController) GetProject(w http.ResponseWriter, r *http.Request) {
 		router.NotFoundError(w, err)
 		return
 	}
-
 	router.EncodeJSONResponse(result, nil, w)
+}
+
+// UpdateProject - Updates the Project by key
+func (c *ApiController) UpdateProject(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	projectKey := params["projectKey"]
+	if errorResponse, err := validateProjectKey(projectKey); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
+		return
+	}
+	body := &model.Project{}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		router.InternalError(w, err)
+		return
+	}
+	result, err := c.service.UpdateProject(projectKey, *body)
+	if err != nil {
+		errRes := result.(model.ErrorResponse)
+		router.HandleErrorResponses(w, errRes)
+		return
+	}
+	status := http.StatusNoContent
+	router.EncodeJSONResponse(``, &status, w)
+}
+
+// CreateProject -  Create a new Project
+func (c *ApiController) CreateProject(w http.ResponseWriter, r *http.Request) {
+	prj := &model.Project{}
+	if err := json.NewDecoder(r.Body).Decode(&prj); err != nil {
+		router.InternalError(w, err)
+		return
+	}
+	if errorResponse, err := validateProjectKey(prj.Key); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
+		return
+	}
+	result, err := c.service.CreateProject(*prj)
+	if err != nil {
+		errRes := result.(model.ErrorResponse)
+		router.HandleErrorResponses(w, errRes)
+		return
+	}
+	status := http.StatusCreated
+	w.Header().Set("Location", fmt.Sprintf("%v/%v", r.RequestURI, prj.Key))
+	router.EncodeJSONResponse(result, &status, w)
+}
+
+func (c *ApiController) DeleteProject(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	projectKey := params["projectKey"]
+	if errorResponse, err := validateProjectKey(projectKey); err != nil {
+		router.BadRequestErrorResponse(w, errorResponse.(model.ErrorResponse))
+		return
+	}
+	result, err := c.service.DeleteProject(projectKey)
+	if err != nil {
+		errRes := result.(model.ErrorResponse)
+		router.HandleErrorResponses(w, errRes)
+		return
+	}
+	status := http.StatusNoContent
+	router.EncodeJSONResponse(``, &status, w)
 }
 
 func validateProjectKey(projectKey string) (interface{}, error) {
