@@ -39,4 +39,23 @@
             contentType: "application/json"
         });
     })
+    // Create new Issue
+    $("#createIssue").on("click", function (e) {
+        e.preventDefault()
+        let projectKey = $("#issuePrjKeyField").val()
+        let newIssue = JSON.stringify({
+            name: $("#issueNameField").val(),
+            description: $("#issueDescriptionField").val()
+        });
+        $.ajax({
+            type: "POST",
+            url: "/rest/v1/projects/" + projectKey + "/issues",
+            data: newIssue,
+            success: function () {
+                location.reload();
+            },
+            dataType: "json",
+            contentType: "application/json"
+        });
+    })
 })(jQuery);

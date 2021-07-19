@@ -19,14 +19,16 @@
         Issue<img src="assets/img/logo.png" alt="Issue Träcking System" style="width:40px;">räcking
     </a>
     <!-- TODO HERE USER SHOULD HAS PERMISSION -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Create
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-create-prj-modal-lg">Create
         Project
     </button>
     <!--<a href="#" class="btn btn-primary" role="button">Create Project</a>-->
     <span class="text-dark">_</span>
     <!-- END HAS PERMISSION -->
     <!-- TODO HERE USER SHOULD HAS PERMISSION -->
-    <a href="#" class="btn btn-primary" role="button">Create Issue</a>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-create-issue-modal-lg">Create
+        Issue
+    </button>
     <span class="text-dark">_</span>
     <!-- END HAS PERMISSION -->
     <button class="btn btn-link btn-sm" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
@@ -73,7 +75,7 @@
         <main>
             <div class="container-fluid">
                 <!-- TODO HERE USER SHOULD HAS PERMISSION -->
-                <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+                <div class="modal fade bd-create-prj-modal-lg" tabindex="-1" role="dialog"
                      aria-labelledby="myLargeModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
@@ -127,6 +129,63 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-primary" id="createProject">Create</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END HAS PERMISSION -->
+                <!-- TODO HERE USER SHOULD HAS PERMISSION -->
+                <div class="modal fade bd-create-issue-modal-lg" tabindex="-1" role="dialog"
+                     aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Create a new Issue</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form class="needs-validation" novalidate>
+                                    <div class="form-row">
+                                        <div class="col-md-3 mb-3">
+                                            <label for="issuePrjKeyField">Issue's Project Key</label>
+                                            <input type="text" class="form-control" id="issuePrjKeyField"
+                                                   placeholder="Project Key" pattern="^[A-Z]{1}[A-Z0-9]{1,}"
+                                                   required>
+                                            <div class="valid-tooltip">
+                                                Validated - OK.
+                                            </div>
+                                            <div class="invalid-tooltip">
+                                                Please choose a existing project key.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-md-3 mb-3">
+                                            <label for="issueNameField">Issue Name</label>
+                                            <input type="text" class="form-control" id="issueNameField"
+                                                   placeholder="Issue Name" pattern="[a-z A-Z0-9]{1,}"
+                                                   required>
+                                            <div class="valid-tooltip">
+                                                Validated - OK.
+                                            </div>
+                                            <div class="invalid-tooltip">
+                                                Please enter a issue name.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-md-3 mb-3">
+                                            <label for="issueDescriptionField">Description</label>
+                                            <textarea class="form-control" id="issueDescriptionField" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" id="createIssue">Create</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             </div>
                         </div>
