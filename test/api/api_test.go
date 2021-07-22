@@ -92,10 +92,13 @@ func (a *apiFeature) theResponseHeaderShouldMatch(headerName string, expectedVal
 }
 
 func InitializeScenario(ctx *godog.ScenarioContext) {
+	var cfg config.Config
 	apiFeature := &apiFeature{}
-	apiFeature.apiRouter = server.NewIssueTrackingSystemRouterV1()
+	apiFeature.apiRouter = server.NewIssueTrackingSystemRouterV1(cfg)
 
 	ctx.BeforeScenario(apiFeature.resetResponse)
+
+	//TODO Given ctx.Step(`^there is ...`
 
 	ctx.Step(`^I send "(GET|POST|PUT|DELETE)" request to "([^"]*)" with body '([^']*)'$`, apiFeature.iSendRequestTo)
 	ctx.Step(`^the response code should be (\d+)$`, apiFeature.theResponseCodeShouldBe)

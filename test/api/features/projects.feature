@@ -83,3 +83,22 @@ Feature: get one or more projects
         "message": "Project with Key Z0ZZZZZZZZZZZZZZZZZ0 not found!"
       }
       """
+
+#create project
+  Scenario: create a new project via UI
+    When I send "POST" request to "/rest/v1/projects" with body '{"key":"AAA","name":"Triple A Game","description":"The fancy 3D Game."}'
+    Then the response code should be 201
+    And the response header "Location" match value "/AAA"
+    And the response should match json:
+       """
+       {
+         "key": "AAA",
+         "name": "Triple A Game",
+         "description": "The fancy 3D Game."
+       }
+       """
+
+#update project
+  Scenario: update a existing project
+    When I send "PUT" request to "/rest/v1/projects/DF" with body '{"key": "DF","name": "DogFooding","description": "The Project used intern for Development. Updated"}'
+    Then the response code should be 204
