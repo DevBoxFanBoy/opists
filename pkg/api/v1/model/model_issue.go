@@ -10,6 +10,7 @@
 
 package model
 
+// internal usage
 type CreationIssue struct {
 	Name string `json:"name"`
 

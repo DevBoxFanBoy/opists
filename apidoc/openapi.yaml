@@ -60,7 +60,7 @@ paths:
               schema:
                 type: string
                 format: uri
-                example: "https://localhost:8080/v1/projects/DF"
+                example: "https://localhost:8080/rest/v1/projects/DF"
           content:
             application/json:
               schema:
@@ -325,7 +325,7 @@ paths:
               schema:
                 type: string
                 format: uri
-                example: "https://localhost:8080/v1/projects/DF/issues/0"
+                example: "https://localhost:8080/rest/v1/projects/DF/issues/0"
           content:
             application/json:
               schema:
