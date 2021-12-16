@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/DevBoxFanBoy/opists/pkg/api/server"
+	"github.com/DevBoxFanBoy/opists/pkg/config"
 	"github.com/cucumber/godog"
 	"github.com/cucumber/godog/colors"
 	"github.com/gorilla/mux"
