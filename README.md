@@ -26,6 +26,29 @@ Boards for agile development (focused on Scrum).
 Testers can plan and execute a test cycle.
 DevOps can evaluate metrics via [prometheus](https://prometheus.io/).
 
+# Security
+
+Add your admin and users to the configuration via example `config.yml`:
+
+````yaml
+server:
+  host: "0.0.0.0"
+  port: 8080
+opists:
+  security:
+    enabled: true
+    enabled_user_logging: true # logs the current caller user
+    authz_model_file_path: "authz_model.conf"  # casbins configuration mapping
+    authz_policy_file_path: "authz_policy.csv" # defined permissions, users, roles
+    admin_username: "admin" # role:superadmin
+    admin_password: "password"
+    users:
+      - username: "bob" #role:user
+        password: "password"
+      - username: "alice" #role:admin
+        password: "password"
+````
+
 # User Interface
 see [ui/docs/UserInterface.md](ui/docs/UserInterface.md)
 
