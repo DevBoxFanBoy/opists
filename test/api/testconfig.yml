@@ -1,0 +1,16 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+opists:
+  security:
+    enabled: true
+    enabled_user_logging: true
+    authz_model_file_path: "../../authz_model.conf"
+    authz_policy_file_path: "../../authz_policy.csv"
+    admin_username: "admin"
+    admin_password: "password"
+    users:
+      - username: "bob"
+        password: "password"
+      - username: "alice"
+        password: "password"

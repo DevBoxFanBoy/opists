@@ -192,9 +192,9 @@ func TestUseCaseController_DeleteIssue_NotFoundProject(t *testing.T) {
 		return
 	}
 	errorResponse := result.(model.ErrorResponse)
-	assert.Equal(t, "Project with Key B not found!", err.Error())
+	assert.Equal(t, "Issue with ID 0 not found!", err.Error())
 	assert.Equal(t, int32(404), errorResponse.Code)
-	assert.Equal(t, "Project with Key B not found!", errorResponse.Message)
+	assert.Equal(t, "Issue with ID 0 not found!", errorResponse.Message)
 }
 
 func TestUseCaseController_DeleteIssue_NotFound(t *testing.T) {
@@ -394,7 +394,7 @@ func TestUseCaseController_UpdateIssue_BadRequest(t *testing.T) {
 	})
 	errorResponse := result.(model.ErrorResponse)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Issue's ProjectKey A is not equal to B!", err.Error())
+	assert.Equal(t, "Issue's ID is required!", err.Error())
 	assert.Equal(t, int32(400), errorResponse.Code)
-	assert.Equal(t, "Issue's ProjectKey A is not equal to B!", errorResponse.Message)
+	assert.Equal(t, "Issue's ID is required!", errorResponse.Message)
 }

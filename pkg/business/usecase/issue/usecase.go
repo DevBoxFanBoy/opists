@@ -14,6 +14,7 @@ type UseCase interface {
 	GetIssueById(string, int64) (interface{}, error)
 	GetProjectIssues(string) (interface{}, error)
 	UpdateIssue(string, model.Issue) (interface{}, error)
+	//TODO PatchIssue(string, model.Issue) (interface{}, error)
 }
 
 var once sync.Once

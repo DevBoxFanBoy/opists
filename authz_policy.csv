@@ -1,0 +1,32 @@
+g, admin, role:superadmin
+g, alice, role:admin
+g, bob, role:user
+p, role:superadmin, all, *
+p, role:admin, data, read
+p, role:admin, /ui/management/index.html, GET
+p, role:admin, /ui/management/projects.html, GET
+p, role:admin, /ui/management/js/*, GET
+p, role:admin, /ui/management/css/*, GET
+p, role:admin, /ui/management/assets/*/*, GET
+p, role:admin, /ui/management/*/issues.html, GET
+p, role:admin, /rest/v1/projects, GET
+p, role:admin, /rest/v1/projects/*, GET
+p, role:admin, /rest/v1/projects/*/issues, GET
+p, role:admin, /rest/v1/projects/*/issues/*, GET
+p, role:admin, data, write
+p, role:admin, /ui/management/projects.html, POST
+p, role:admin, /rest/v1/projects, POST
+p, role:admin, /rest/v1/projects/*, PUT
+p, role:admin, /rest/v1/projects/*/issues, POST
+p, role:admin, /rest/v1/projects/*/issues, PUT
+p, role:admin, /rest/v1/projects/*/issues, DELETE
+p, role:user, data, read
+p, role:user, /ui/management/index.html, GET
+p, role:user, /ui/management/projects.html, GET
+p, role:user, /ui/management/js/*, GET
+p, role:user, /ui/management/css/*, GET
+p, role:user, /ui/management/assets/*/*, GET
+p, role:user, /ui/management/*/issues.html, GET
+p, role:user, /rest/v1/projects, GET
+p, role:user, /rest/v1/projects/*/issues, GET
+p, role:user, /rest/v1/projects/*/issues/*, GET

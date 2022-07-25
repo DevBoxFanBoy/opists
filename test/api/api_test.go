@@ -8,7 +8,8 @@ import (
 	"github.com/DevBoxFanBoy/opists/pkg/config"
 	"github.com/cucumber/godog"
 	"github.com/cucumber/godog/colors"
-	"github.com/gorilla/mux"
+	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/urfave/negroni"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -18,22 +19,32 @@ import (
 	"testing"
 )
 
+type currentUser struct {
+	username string
+	password string
+}
+
 type apiFeature struct {
+	user      *currentUser
 	resp      *httptest.ResponseRecorder
-	apiRouter *mux.Router
+	apiRouter *negroni.Negroni
+	config    config.Config
 }
 
 func (a *apiFeature) resetResponse(*godog.Scenario) {
 	a.resp = httptest.NewRecorder()
+	a.user = nil
 }
 
 func (a *apiFeature) iSendRequestTo(method, endpoint string, body string) (err error) {
 	req, err := http.NewRequest(method, endpoint, requestBody(body))
+	if a.user != nil {
+		req.SetBasicAuth(strings.TrimSpace(a.user.username), a.user.password)
+	}
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-
 	// handle panic
 	defer func() {
 		switch t := recover().(type) {
@@ -44,7 +55,6 @@ func (a *apiFeature) iSendRequestTo(method, endpoint string, body string) (err e
 			fmt.Println(err.Error())
 		}
 	}()
-
 	a.apiRouter.ServeHTTP(a.resp, req)
 	return
 }
@@ -92,15 +102,24 @@ func (a *apiFeature) theResponseHeaderShouldMatch(headerName string, expectedVal
 	return nil
 }
 
+func (a *apiFeature) asUser(user string) error {
+	a.user = &currentUser{strings.TrimSpace(user), a.config.Opists.Security.AdminPassword}
+	return nil
+}
+
 func InitializeScenario(ctx *godog.ScenarioContext) {
 	var cfg config.Config
-	apiFeature := &apiFeature{}
-	apiFeature.apiRouter = server.NewIssueTrackingSystemRouterV1(cfg)
+	if err := cleanenv.ReadConfig("testconfig.yml", &cfg); err != nil {
+		fmt.Printf("Server config error: %v\n", err)
+		os.Exit(1)
+	}
+	apiFeature := &apiFeature{config: cfg}
+	apiFeature.apiRouter = server.NewIssueTrackingSystem(cfg)
 
 	ctx.BeforeScenario(apiFeature.resetResponse)
 
 	//TODO Given ctx.Step(`^there is ...`
-
+	ctx.Step(`^As "([^"]*)" User$`, apiFeature.asUser)
 	ctx.Step(`^I send "(GET|POST|PUT|DELETE)" request to "([^"]*)" with body '([^']*)'$`, apiFeature.iSendRequestTo)
 	ctx.Step(`^the response code should be (\d+)$`, apiFeature.theResponseCodeShouldBe)
 	ctx.Step(`^the response should match json:$`, apiFeature.theResponseShouldMatchJSON)
@@ -121,7 +140,7 @@ func TestMain(m *testing.M) {
 	opts.Paths = flag.Args()
 
 	status := godog.TestSuite{
-		Name:                "projects",
+		Name:                "all",
 		ScenarioInitializer: InitializeScenario,
 		Options:             &opts,
 	}.Run()
