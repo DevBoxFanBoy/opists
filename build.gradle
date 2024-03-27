@@ -1,6 +1,7 @@
 plugins {
     id 'war'
     id 'io.openliberty.tools.gradle.Liberty' version '3.8.2'
+    id 'io.franzbecker.gradle-lombok' version '5.0.0'
 }
 
 version '1.0-SNAPSHOT'
@@ -12,17 +13,49 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+lombok {
+    version = "1.18.30"
+    sha256 = "" // skip verifyLombok task
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 repositories {
     mavenCentral()
 }
 
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     // provided dependencies
-    providedCompile 'jakarta.platform:jakarta.jakartaee-api:10.0.0' 
+    providedCompile 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
     providedCompile 'org.eclipse.microprofile:microprofile:6.1'
 
     // third-party dependencies
-    //implementation 'org.casbin:jcasbin:1.54.0'
+    implementation 'org.casbin:jcasbin:1.54.0'
+    //implementation 'org.casbin:hibernate-adapter:1.0.0'
+
+    implementation 'org.hibernate.orm:hibernate-core:6.4.4.Final'
+
+    implementation 'org.flywaydb:flyway-core:10.10.0'
+
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+
+    // JUnit Jupiter API and Engine for writing tests and running them
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+
+    testImplementation 'com.h2database:h2:2.2.220'
+
+    //testImplementation 'de.hilling.junit.cdi:cdi-test-core:4.3.0'
 }
 
 clean.dependsOn 'libertyStop'

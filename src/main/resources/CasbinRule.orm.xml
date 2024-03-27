@@ -1,0 +1,39 @@
+<entity-mappings xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm
+                 http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
+                 version="2.1">
+
+    <entity class="com.devboxfanboy.security.jcasbin.entity.CasbinRule" access="FIELD">
+        <table name="CASBIN_RULE" schema="opistsschema"/>
+        <attributes>
+            <id name="id">
+                <column name="ID"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="ptype">
+                <column name="PTYPE"/>
+            </basic>
+            <basic name="v0">
+                <column name="V0"/>
+            </basic>
+            <basic name="v1">
+                <column name="V1"/>
+            </basic>
+            <basic name="v2">
+                <column name="V2"/>
+            </basic>
+            <basic name="v3">
+                <column name="V3"/>
+            </basic>
+            <basic name="v4">
+                <column name="V4"/>
+            </basic>
+            <basic name="v5">
+                <column name="V5"/>
+            </basic>
+            <version name="version" access="FIELD"/>
+        </attributes>
+    </entity>
+
+</entity-mappings>
