@@ -3,6 +3,10 @@ package com.devboxfanboy;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.output.MigrateResult;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FlywayUtil {
 
     public static void setUp() {

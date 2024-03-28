@@ -7,8 +7,12 @@ plugins {
 version '1.0-SNAPSHOT'
 group 'com.devboxfanboy'
 
-sourceCompatibility = 17
 targetCompatibility = 17
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
@@ -39,7 +43,6 @@ dependencies {
 
     // third-party dependencies
     implementation 'org.casbin:jcasbin:1.54.0'
-    //implementation 'org.casbin:hibernate-adapter:1.0.0'
 
     implementation 'org.hibernate.orm:hibernate-core:6.4.4.Final'
 
@@ -48,14 +51,56 @@ dependencies {
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'org.apache.commons:commons-lang3:3.14.0'
 
+    implementation 'org.slf4j:slf4j-api:2.0.12'
+    implementation 'ch.qos.logback:logback-classic:1.5.3'
+    implementation 'ch.qos.logback:logback-core:1.5.3'
+    implementation 'org.slf4j:log4j-over-slf4j:2.0.12'
+
+    //implementation 'org.lazyluke:log4jdbc-remix:0.2.7'
+
+    implementation "com.googlecode.log4jdbc:log4jdbc:1.2"
+
     // JUnit Jupiter API and Engine for writing tests and running them
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
 
-    testImplementation 'com.h2database:h2:2.2.220'
+    implementation 'com.h2database:h2:2.2.220'
+
 
     //testImplementation 'de.hilling.junit.cdi:cdi-test-core:4.3.0'
+}
+
+
+task generateStaticTestData(type: JavaExec, dependsOn: compileJava) {
+    description 'Generates static test data.'
+
+    mainClass.value "com.devboxfanboy.staticgen.StaticTestDataGenerator"
+    classpath = sourceSets.main.runtimeClasspath
+
+    systemProperty 'logback.configurationFile', 'logback-gentestdata.xml'
+    systemProperty 'log4jdbc.drivers', 'org.h2.Driver'
+    systemProperty 'log4jdbc.auto.load.popular.drivers', 'false'
+    systemProperty 'log4jdbc.debug.stack.prefix', 'com.devboxfanboy.'
+    systemProperty 'log4jdbc.dump.booleanastruefalse', 'true'
+    systemProperty 'log4jdbc.dump.sql.maxlinelength', '0'
+    systemProperty 'log4jdbc.dump.fulldebugstacktrace', 'false'
+    // set to true to log all SQL statements
+    systemProperty 'log4jdbc.dump.sql.select', 'false'
+
+    systemProperty 'log4jdbc.dump.sql.insert', 'true'
+    systemProperty 'log4jdbc.dump.sql.update', 'true'
+    systemProperty 'log4jdbc.dump.sql.delete', 'true'
+    systemProperty 'log4jdbc.dump.sql.create', 'true'
+    systemProperty 'log4jdbc.dump.sql.addsemicolon', 'true'
+    systemProperty 'log4jdbc.statement.warn', 'false'
+    systemProperty 'log4jdbc.trim.sql', 'false'
+    systemProperty 'log4jdbc.trim.sql.extrablanklines', 'false'
+    systemProperty 'log4jdbc.suppress.generated.keys.exception', 'false'
+}
+
+configurations {
+    all*.exclude group:'log4j', module:'log4j'
 }
 
 clean.dependsOn 'libertyStop'

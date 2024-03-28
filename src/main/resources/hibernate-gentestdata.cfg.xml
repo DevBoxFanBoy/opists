@@ -11,8 +11,10 @@
         <property name="connection.username">dbadmin</property>
         <property name="connection.password">testdb</property>
         <property name="hibernate.default_schema">opistsschema</property>
-        <property name="show_sql">true</property>
-        <property name="hibernate.generate_statistics">true</property>
+        <property name="show_sql">false</property>
+        <property name="format_sql">false</property>
+        <property name="use_sql_comments">false</property>
+        <property name="hibernate.generate_statistics">false</property>
         <property name="hbm2ddl.auto">validate</property>
 
         <property name="connection.pool_size">1</property>
@@ -21,6 +23,9 @@
         <property name="hibernate.dbcp.maxIdle">10</property>
         <property name="hibernate.dbcp.minIdle">5</property>
         <property name="hibernate.dbcp.maxWaitMillis">-1</property>
+
+        <property name="hibernate.jdbc.batch_size">0</property>
+        <property name="hibernate.default_batch_fetch_size">0</property>
 
         <!-- add as resources -->
         <mapping resource="CasbinRule.orm.xml" />
