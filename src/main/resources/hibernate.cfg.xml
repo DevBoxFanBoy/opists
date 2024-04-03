@@ -22,8 +22,7 @@
         <property name="hibernate.dbcp.minIdle">5</property>
         <property name="hibernate.dbcp.maxWaitMillis">-1</property>
 
-        <!-- add as resources -->
-        <mapping resource="CasbinRule.orm.xml" />
+        <mapping class="com.devboxfanboy.security.jcasbin.entity.CasbinRule"/>
 
     </session-factory>
 

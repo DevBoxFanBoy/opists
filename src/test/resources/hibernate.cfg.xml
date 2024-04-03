@@ -27,8 +27,7 @@
         <property name="hibernate.jdbc.batch_size">0</property>
         <property name="hibernate.default_batch_fetch_size">0</property>
 
-        <!-- add as resources -->
-        <mapping resource="CasbinRule.orm.xml" />
+        <mapping class="com.devboxfanboy.security.jcasbin.entity.CasbinRule"/>
 
     </session-factory>
 

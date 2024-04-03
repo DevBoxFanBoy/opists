@@ -1,11 +1,18 @@
 package com.devboxfanboy.security.jcasbin.entity;
 
+import java.util.Objects;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.type.SqlTypes;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -51,25 +58,67 @@ import lombok.ToString;
  * Please note that the interpretation of v0 to v5 depends on your specific Casbin model configuration
  * and the requirements of your application. It's possible that v0 to v5 have a different meaning in your application.
  */
+@NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
 @ToString
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
-@NoArgsConstructor()
 @Entity
 @Table(name = "casbin_rule", schema = "opistsschema")
 public class CasbinRule {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
-    private int version;
 
+    @Version
+    @Column(name = "version")
+    @JdbcTypeCode(SqlTypes.INTEGER)
+    private Integer version;
+
+    @Column(name = "ptype")
     private String ptype;
+    @Column(name = "v0")
     private String v0;
+    @Column(name = "v1")
     private String v1;
+    @Column(name = "v2")
     private String v2;
+    @Column(name = "v3")
     private String v3;
+    @Column(name = "v4")
     private String v4;
+    @Column(name = "v5")
     private String v5;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> oEffectiveClass;
+        if (o instanceof HibernateProxy hibernateProxy) {
+            oEffectiveClass = hibernateProxy.getHibernateLazyInitializer().getPersistentClass();
+        } else {
+            oEffectiveClass = o.getClass();
+        }
+        Class<?> thisEffectiveClass;
+        if (this instanceof HibernateProxy hibernateProxy) {
+            thisEffectiveClass = hibernateProxy.getHibernateLazyInitializer().getPersistentClass();
+        } else {
+            thisEffectiveClass = this.getClass();
+        }
+        if (thisEffectiveClass != oEffectiveClass) {
+            return false;
+        }
+        CasbinRule that = (CasbinRule) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        if (this instanceof HibernateProxy hibernateProxy) {
+            return hibernateProxy.getHibernateLazyInitializer().getPersistentClass().hashCode();
+        }
+        return getClass().hashCode();
+    }
 }

@@ -69,6 +69,8 @@ dependencies {
 
 
     //testImplementation 'de.hilling.junit.cdi:cdi-test-core:4.3.0'
+
+    testImplementation 'org.jboss.weld.se:weld-se-core:5.1.2.Final'
 }
 
 

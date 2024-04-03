@@ -13,7 +13,7 @@ import com.devboxfanboy.exception.AuthorizationException;
 import com.devboxfanboy.hibernate.HibernateUtil;
 import com.devboxfanboy.security.jcasbin.adapter.HibernateAdapter;
 
-class AuthorizationManagerIntTest {
+class AuthorizationManagerTest {
 
     Enforcer enforcer;
 

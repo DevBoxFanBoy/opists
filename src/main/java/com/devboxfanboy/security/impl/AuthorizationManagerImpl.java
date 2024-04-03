@@ -1,15 +1,39 @@
 package com.devboxfanboy.security.impl;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
 import org.casbin.jcasbin.main.Enforcer;
+import org.casbin.jcasbin.model.Model;
+import org.hibernate.SessionFactory;
 
 import com.devboxfanboy.exception.AuthorizationException;
+import com.devboxfanboy.hibernate.HibernateUtil;
 import com.devboxfanboy.security.AuthorizationManager;
+import com.devboxfanboy.security.jcasbin.adapter.HibernateAdapter;
+import jakarta.annotation.PostConstruct;
+import jakarta.ejb.Stateless;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Stateless
 public class AuthorizationManagerImpl implements AuthorizationManager {
     private Enforcer enforcer;
 
-    public AuthorizationManagerImpl(Enforcer enforcer) {
-        this.enforcer = enforcer;
+    @PostConstruct
+    public void init() {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        HibernateAdapter adapter = new HibernateAdapter("opistsschema", "casbin_rule", sessionFactory);
+        try (InputStream in = AuthorizationManagerImpl.class.getResourceAsStream("/model.conf")) {
+            Model model = Model.newModelFromString(IOUtils.toString(in, StandardCharsets.UTF_8));
+            enforcer = new Enforcer(model, adapter);
+            enforcer.loadPolicy();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
