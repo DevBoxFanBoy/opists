@@ -1,0 +1,6 @@
+plugins {
+    id 'myproject.java-conventions'
+}
+
+group = 'com.devboxfanboy'
+version = '1.0-SNAPSHOT'

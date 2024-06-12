@@ -1,4 +1,4 @@
-package com.devboxfanboy.config.feature;
+package com.devboxfanboy.feature;
 
 public enum Feature {
     NOTIFICATIONS,

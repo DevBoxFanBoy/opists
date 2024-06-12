@@ -1,0 +1,15 @@
+plugins {
+    id 'myproject.java-conventions'
+}
+
+group = 'com.devboxfanboy'
+version = '1.0-SNAPSHOT'
+
+dependencies {
+    implementation project(':persistence-util')
+    implementation project(':security')
+    implementation project(':testsuite')
+    implementation 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
+
+    implementation 'com.h2database:h2:2.2.220'
+}

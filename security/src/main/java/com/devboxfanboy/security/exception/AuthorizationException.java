@@ -1,4 +1,4 @@
-package com.devboxfanboy.exception;
+package com.devboxfanboy.security.exception;
 
 public class AuthorizationException extends Exception {
 }

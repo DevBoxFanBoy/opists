@@ -1,0 +1,29 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+
+        <property name="connection.driver_class">net.sf.log4jdbc.DriverSpy</property>
+        <property name="connection.url">jdbc:log4jdbc:h2:mem:productiondb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL</property>
+        <property name="connection.username">dbadmin</property>
+        <property name="connection.password">testdb</property>
+        <property name="hibernate.default_schema">opistsschema</property>
+        <property name="show_sql">true</property>
+        <property name="hibernate.generate_statistics">true</property>
+        <property name="hbm2ddl.auto">validate</property>
+
+        <property name="connection.pool_size">1</property>
+        <property name="hibernate.dbcp.initialSize">5</property>
+        <property name="hibernate.dbcp.maxTotal">20</property>
+        <property name="hibernate.dbcp.maxIdle">10</property>
+        <property name="hibernate.dbcp.minIdle">5</property>
+        <property name="hibernate.dbcp.maxWaitMillis">-1</property>
+
+        <mapping class="com.devboxfanboy.security.jcasbin.entity.CasbinRule"/>
+
+    </session-factory>
+
+</hibernate-configuration>

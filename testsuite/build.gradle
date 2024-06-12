@@ -1,0 +1,25 @@
+plugins {
+    id 'myproject.java-conventions'
+}
+
+group = 'com.devboxfanboy'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation project(':persistence-util')
+    implementation project(':security')
+
+
+    runtimeOnly 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
+
+    implementation 'org.jboss.weld.se:weld-se-core:5.1.2.Final'
+
+    implementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    compileOnly 'org.mockito:mockito-junit-jupiter:5.11.0'
+}

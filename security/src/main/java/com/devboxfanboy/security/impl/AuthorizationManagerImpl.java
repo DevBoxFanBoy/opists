@@ -8,9 +8,9 @@ import org.casbin.jcasbin.main.Enforcer;
 import org.casbin.jcasbin.model.Model;
 import org.hibernate.SessionFactory;
 
-import com.devboxfanboy.exception.AuthorizationException;
 import com.devboxfanboy.hibernate.HibernateUtil;
 import com.devboxfanboy.security.AuthorizationManager;
+import com.devboxfanboy.security.exception.AuthorizationException;
 import com.devboxfanboy.security.jcasbin.adapter.HibernateAdapter;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Stateless;

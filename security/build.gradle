@@ -1,0 +1,14 @@
+plugins {
+    id 'myproject.java-conventions'
+}
+
+group = 'com.devboxfanboy'
+version = '1.0-SNAPSHOT'
+
+dependencies {
+    implementation 'org.casbin:jcasbin:1.54.0'
+    implementation project(':persistence-util')
+    implementation 'org.hibernate.orm:hibernate-core:6.4.4.Final'
+
+    compileOnly 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
+}

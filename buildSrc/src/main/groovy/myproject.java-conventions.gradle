@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'io.franzbecker.gradle-lombok'
+}
+
+version '1.0-SNAPSHOT'
+group 'com.devboxfanboy'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = 17
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+lombok {
+    version = "1.18.30"
+    sha256 = "" // skip verifyLombok task
+}
+
+test {
+    useJUnitPlatform()
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+
+    implementation 'org.slf4j:slf4j-api:2.0.12'
+    implementation 'ch.qos.logback:logback-classic:1.5.3'
+    implementation 'ch.qos.logback:logback-core:1.5.3'
+    implementation 'org.slf4j:log4j-over-slf4j:2.0.12'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+}
+
+repositories {
+    mavenCentral()
+}
